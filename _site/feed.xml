@@ -1,20 +1,22 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-27T22:57:17+08:00</updated><id>http://localhost:4000/</id><title type="html">Pangweichao</title><subtitle>java web 后端</subtitle><entry><title type="html">javaMail的简单封装</title><link href="http://localhost:4000/javaMail/" rel="alternate" type="text/html" title="javaMail的简单封装" /><published>2017-04-26T00:00:00+08:00</published><updated>2017-04-26T00:00:00+08:00</updated><id>http://localhost:4000/javaMail</id><content type="html" xml:base="http://localhost:4000/javaMail/">&lt;p&gt;javamail是Sun发布的用来处理email的API。javamail api有几个核心类，分别是Session,Message,Address,Authenticator,Transport,Store,Folder,MimeMessage,InternetAddress.关于这些的介绍肯定是api文档介绍的详细或者上网随便一搜一大片。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-27T23:28:26+08:00</updated><id>http://localhost:4000/</id><title type="html">Pangweichao</title><subtitle>java web 后端</subtitle><entry><title type="html">javaMail的简单封装</title><link href="http://localhost:4000/javaMail/" rel="alternate" type="text/html" title="javaMail的简单封装" /><published>2017-04-26T00:00:00+08:00</published><updated>2017-04-26T00:00:00+08:00</updated><id>http://localhost:4000/javaMail</id><content type="html" xml:base="http://localhost:4000/javaMail/">&lt;p&gt;javamail是Sun发布的用来处理email的API。javamail api有几个核心类，分别是Session,Message,Address,Authenticator,Transport,Store,Folder,MimeMessage,InternetAddress.关于这些的介绍肯定是api文档介绍的详细或者上网随便一搜一大片。&lt;/p&gt;
 
 &lt;p&gt;接下来简单说一下封装之前的步骤以及一个我在封装过程中遇到的问题，网上对于这个问题的一些答案感觉有点问题。&lt;/p&gt;
 
-&lt;p&gt;在封装之前我们要去邮箱的设置里打开POP3/SMTP服务。如图 &lt;img src=&quot;https://github.com/pang-weichao/pang-weichao.github.io/blob/master/assets/img/postimg/17042601.png&quot; alt=&quot;开启服务&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;在封装之前我们要去邮箱的设置里打开POP3/SMTP服务。如图 &lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-ea49e7558471f453.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;开启服务&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;以qq邮箱为例，开启之前右上角的箭头指向的应该是开启，点击开启，之后点击生成授权码，这个授权码就是之后封装时候的密码。拿到授权码我们就可以开始封装了。&lt;/p&gt;
 
-&lt;p&gt;问题：封装过程中如果不开启ssl加密，如图&lt;/p&gt;
+&lt;p&gt;问题：封装过程中如果不开启ssl加密，如图 &lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-8b6a908859cc5668.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;ssl加密&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;上图是开启的代码，如果没有这段开启的代码那么他就会提示如下错误，&lt;/p&gt;
+&lt;p&gt;上图是开启的代码，如果没有这段开启的代码那么他就会提示如下错误，&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-577bc68ec6ed5a20.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;530错误&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;这个错误，上网之后你搜530 Error: A secure connection is requiered(such as ssl)会出现让你将smtp.qq.com改为smtp.exmail.qq.com 按他的改了之后再次运行又会有如下错误&lt;/p&gt;
+&lt;p&gt;这个错误，上网之后你搜530 Error: A secure connection is requiered(such as ssl)会出现让你将smtp.qq.com改为smtp.exmail.qq.com 按他的改了之后再次运行又会有如下错误&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-6b88b1d9aa7a0845.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;535错误&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;这个提示你封装的时候密码需要使用授权码，但我们确实是用了授权码啊。&lt;/p&gt;
 
-&lt;p&gt;其实这个问题只要你开启了ssl加密之后就会解决，而对于163邮箱来说没有这个ssl加密也可以正常运行。对于邮箱是否需要ssl加密，我只试了163和qq，qq需要163不需要。&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="javaMail" /><summary type="html">邮件封装的简单封装</summary></entry><entry><title type="html">Moon Jekyll Theme</title><link href="http://localhost:4000/moon-theme/" rel="alternate" type="text/html" title="Moon Jekyll Theme" /><published>2016-04-06T00:00:00+08:00</published><updated>2016-04-06T00:00:00+08:00</updated><id>http://localhost:4000/moon-theme</id><content type="html" xml:base="http://localhost:4000/moon-theme/">&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509720/61c61058-01d6-11e6-93ab-0918515ecd56.png&quot; alt=&quot;Moon Homepage&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;其实这个问题只要你开启了ssl加密之后就会解决，而对于163邮箱来说没有这个ssl加密也可以正常运行。对于邮箱是否需要ssl加密，我只试了163和qq，qq需要163不需要。&lt;/p&gt;
+
+&lt;p&gt;最后放上源码地址:&lt;a href=&quot;https://github.com/pang-weichao/javamailDemo&quot;&gt;javaMail源码&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="javaMail" /><summary type="html">邮件封装的简单封装</summary></entry><entry><title type="html">Moon Jekyll Theme</title><link href="http://localhost:4000/moon-theme/" rel="alternate" type="text/html" title="Moon Jekyll Theme" /><published>2016-04-06T00:00:00+08:00</published><updated>2016-04-06T00:00:00+08:00</updated><id>http://localhost:4000/moon-theme</id><content type="html" xml:base="http://localhost:4000/moon-theme/">&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509720/61c61058-01d6-11e6-93ab-0918515ecd56.png&quot; alt=&quot;Moon Homepage&quot; /&gt;&lt;/p&gt;
 
 &lt;center&gt;&lt;b&gt;Moon&lt;/b&gt; is a minimal, one column jekyll theme.&lt;/center&gt;
 
