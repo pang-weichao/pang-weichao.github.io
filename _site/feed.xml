@@ -1,4 +1,534 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-27T23:28:26+08:00</updated><id>http://localhost:4000/</id><title type="html">Pangweichao</title><subtitle>java web 后端</subtitle><entry><title type="html">javaMail的简单封装</title><link href="http://localhost:4000/javaMail/" rel="alternate" type="text/html" title="javaMail的简单封装" /><published>2017-04-26T00:00:00+08:00</published><updated>2017-04-26T00:00:00+08:00</updated><id>http://localhost:4000/javaMail</id><content type="html" xml:base="http://localhost:4000/javaMail/">&lt;p&gt;javamail是Sun发布的用来处理email的API。javamail api有几个核心类，分别是Session,Message,Address,Authenticator,Transport,Store,Folder,MimeMessage,InternetAddress.关于这些的介绍肯定是api文档介绍的详细或者上网随便一搜一大片。&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.5.1">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2017-07-28T14:13:04+08:00</updated><id>http://localhost:4000/</id><title type="html">Pangweichao</title><subtitle>java web 后端</subtitle><entry><title type="html">mybatis和hibernate的一点总结</title><link href="http://localhost:4000/07-hibernate&mybatis/" rel="alternate" type="text/html" title="mybatis和hibernate的一点总结" /><published>2017-07-13T00:00:00+08:00</published><updated>2017-07-13T00:00:00+08:00</updated><id>http://localhost:4000/07-hibernate&amp;mybatis</id><content type="html" xml:base="http://localhost:4000/07-hibernate&amp;mybatis/">&lt;h3 id=&quot;orm框架&quot;&gt;orm框架&lt;/h3&gt;
+&lt;p&gt;orm(Object Relational Mapping)对象关系映射。我们的java应用程序是对象型而我们的数据库却是关系型数据库，那么我们的java应用和我们的数据库之间的数据交互一定存在着数据类型转换。而我们的orm框架就是实现java应用和数据库之间的数据交互功能，因为它是将我们存储在内存中的pojo对象的数据映射存入数据库中，所以orm框架我们又可以说是持久化框架。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;hibernatemybatis&quot;&gt;hibernate&amp;amp;mybatis&lt;/h3&gt;
+&lt;p&gt;我们从最大粒度的角度去看hibernate和mybatis分别在ssh和ssm项目中的配置，其实两者差的不是很多，都是需要配置一个sessionfactory，然后通过这个factory去创建sqlsession，而sqlsession就是框架提供给我们的执行sql语句的顶层api。只是两者在底层实现上的不同导致了配置细节上的不同，hibernate创建sessionfactory是通过配置LocalSessionFactoryBean来实现，而mybatis是通过配置SqlSessionFactoryBean来创建sessionfactory。具体配置如下：&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &amp;lt;!--hibernate配置sessionFactory--&amp;gt;
+    &amp;lt;bean id=&quot;sessionFactory&quot; class=&quot;org.springframework.orm.hibernate5.LocalSessionFactoryBean&quot;&amp;gt;
+        &amp;lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&amp;gt;
+        &amp;lt;property name=&quot;packagesToScan&quot;&amp;gt;
+            &amp;lt;value&amp;gt;cn.pwc.demo.entity&amp;lt;/value&amp;gt;
+        &amp;lt;/property&amp;gt;
+        &amp;lt;property name=&quot;hibernateProperties&quot;&amp;gt;
+            &amp;lt;props&amp;gt;
+                &amp;lt;prop key=&quot;hibernate.show_sql&quot;&amp;gt;true&amp;lt;/prop&amp;gt;
+                &amp;lt;prop key=&quot;hibernate.format_sql&quot;&amp;gt;true&amp;lt;/prop&amp;gt;
+                &amp;lt;prop key=&quot;hibernate.use_sql_comments&quot;&amp;gt;true&amp;lt;/prop&amp;gt;
+            &amp;lt;/props&amp;gt;
+        &amp;lt;/property&amp;gt;
+    &amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &amp;lt;!--mybatis配置sessionFactory--&amp;gt;
+    &amp;lt;bean id=&quot;sessionFactory&quot; class=&quot;org.mybatis.spring.SqlSessionFactoryBean&quot;&amp;gt;
+        &amp;lt;property name=&quot;dataSource&quot; ref=&quot;dataSource&quot;/&amp;gt;
+        &amp;lt;property name=&quot;mapperLocations&quot; value=&quot;classpath:/mybatisXml/*.xml&quot;/&amp;gt;
+        &amp;lt;property name=&quot;configLocation&quot; value=&quot;classpath:/mybatis-config.xml&quot;/&amp;gt;
+        &amp;lt;property name=&quot;typeAliasesPackage&quot; value=&quot;cn.pwc.demo.entity&quot;/&amp;gt;
+    &amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;当然除了配置sessionfactory之外我们还需要配置数据源，因为orm框架就是和数据库打交道的，他怎么能不知道数据库在哪呢。而dataSource的实现可以用c3p0,druid等来创建连接池，以减少频繁的创建和销毁连接对象而造成的资源损失。除此之外，对于数据库的操作，我们需要配置事务管理，只是在相应框架中的具体实现上不同而已。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;总结&quot;&gt;总结&lt;/h3&gt;
+&lt;p&gt;对于框架的使用上来说，我们只是需要配置好框架提供给我们的操作数据库的顶层api和设置相关参数就好，其他的比如事务的提交，sql语句的执行等等，都交给框架就行，对于我们而言可以说是透明的。
+对于整个项目来说，这里就可以体会到mvc模式的解耦带来的便利，我们可以轻易的更换数据持久层的框架，而不用动其他地方的代码。&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/pang-weichao/ssh&quot;&gt;ssh源码地址&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/pang-weichao/ssm&quot;&gt;ssm源码地址&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="hibernate" /><category term="mybatis" /><summary type="html">对于mybatis和hibernate两个orm层框架的粗总结</summary></entry><entry><title type="html">spring spring-mvc hibernate简单搭建后台</title><link href="http://localhost:4000/06-SSH/" rel="alternate" type="text/html" title="spring spring-mvc hibernate简单搭建后台" /><published>2017-05-31T00:00:00+08:00</published><updated>2017-05-31T00:00:00+08:00</updated><id>http://localhost:4000/06-SSH</id><content type="html" xml:base="http://localhost:4000/06-SSH/">&lt;h3 id=&quot;该后台只是ssh的简单搭建涉及到的内容&quot;&gt;该后台只是ssh的简单搭建，涉及到的内容&lt;/h3&gt;
+&lt;p&gt;1.使用spring aop来显示controller层方法调用的时间以及调用的是什么哪个接口的什么方法
+2.未登录请求的处理
+3.拦截器的实现
+4.登陆实现
+5.ehcache的使用
+6.log4j进行日志的打印&lt;/p&gt;
+
+&lt;h3 id=&quot;实现过程中遇到的几个问题&quot;&gt;实现过程中遇到的几个问题&lt;/h3&gt;
+&lt;p&gt;1.在使用spring aop编程时，切面声明好了，切入点也写好了，自动代理也在配置中激活了，但就是织入不进去，问题出在被代理的对象得加@EnableAspectJAutoProxy注解，我把他理解为你要代理他，必须得到他的同意，这个注解就是他同意你代理的一种标志。&lt;/p&gt;
+
+&lt;p&gt;2.在进行拦截器的配置时，由于在web.xml中使用&lt;url-pattern&gt;/&lt;/url-pattern&gt;配置，导致spring mvc将捕获所有的在容器当中的请求，而我们的静态资源比如js,css,html…这些都是不需要进入spring mvc的，如果请求进入则会被我们的拦截器给拦截住，所以我们要把静态资源释放出来，使用mvc:resources来进行释放，但是我进行释放之后他居然还给我拦截住，查了网上资料之后，一种处理方法是在拦截器定义中增加&lt;mvc:exclude-mapping path=&quot;/**/*.js&quot;&gt;&lt;/mvc:exclude-mapping&gt;，其他资源类似处理。&lt;/p&gt;
+
+&lt;p&gt;3.重定向问题，问题的背景是我在浏览器中直接访问接口/user/test，拦截器拦下（因为没有登陆嘛），重定向到login页面很正常，但是如果点击测试按钮（同样没有登陆）访问的也是/user/test接口，拦截器拦下但是并没有重定向到login页面，一开始以为我的拦截器中的重定向问题，后来马上也排除了（重定向问题我的第一种请求方式应该也会出问题），后来打开f12，看到network中login页面已经被我获取到了，但是页面没有展示出来，同时我在console里看到我的ajax请求进入了error里面，判断出应该是ajxa出问题了。后来上网查资料才想到，ajax只是支持页面的局部刷新，而我现在要做的是重新加载页面，所以我就在拦截器中做了下判断看是否是ajax发出的请求还是浏览器地址栏中的直接请求，分别做一下处理。可能有人会想到为什么没有登录可以看到测试按钮的那个界面，他应该登陆才能看到啊。对的，只有登陆才能看到里面的页面的处理我也做了，但我把它注释掉了，因为发现了重定向的问题。&lt;/p&gt;
+
+&lt;h3 id=&quot;项目中使用到的工具和方法&quot;&gt;项目中使用到的工具和方法&lt;/h3&gt;
+&lt;p&gt;1.热部署工具jrebel，java文件的改动可以不用在重启服务器。
+2.hibernate逆向生成实体类，简化我们的工作。
+以上两个在网上有很多的资料可以自行查看。&lt;/p&gt;
+
+&lt;h3 id=&quot;源码处理&quot;&gt;源码处理&lt;/h3&gt;
+&lt;p&gt;因为这是公开的所以我把mysql数据库的配置文件的用户名和密码删了，有需要者请自行下载源码配置自己的数据库就行，数据库的sql文件在sql文件夹下的demo.sql。&lt;/p&gt;
+
+&lt;p&gt;源码地址：&lt;a href=&quot;https://github.com/pang-weichao/ssh&quot;&gt;springDemo&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="spring" /><category term="spring-mvc" /><category term="hibernate" /><summary type="html">SSH框架的实践</summary></entry><entry><title type="html">spring 四aop</title><link href="http://localhost:4000/05-springFour/" rel="alternate" type="text/html" title="spring 四aop" /><published>2017-05-10T00:00:00+08:00</published><updated>2017-05-10T00:00:00+08:00</updated><id>http://localhost:4000/05-springFour</id><content type="html" xml:base="http://localhost:4000/05-springFour/">&lt;h3 id=&quot;aop是什么&quot;&gt;aop是什么?&lt;/h3&gt;
+&lt;p&gt;aop(aspect oriented programming) 面向切面编程，对所有对象或者一类对象的编程。
+举个例子，我们现在有3个类，每个类都有同样的一个需求，其功能是记录该类的调用时间，那么我们是不是就需要在三个类中写三遍同样的代码，如果类越来越多呢，每个类都写一遍？不现实，那么这里我们就可以使用aop编程，他可以就写一遍该方法，然后将该方法织入给每个类。看下图再初步理解一下
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-0b8936287f759eaf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;初步理解图&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;下面我们根据aop中的概念结合例子来看看(先看概念再看例子再看概念)。&lt;/p&gt;
+&lt;h3 id=&quot;aop中的几个概念&quot;&gt;aop中的几个概念&lt;/h3&gt;
+&lt;ol&gt;
+  &lt;li&gt;切面：要实现的功能，是系统模块化的一个切面或领域。如调用时间。&lt;/li&gt;
+  &lt;li&gt;通知：切面的实际实现，他通知系统新的行为。通知在连接点插入到系统中。&lt;/li&gt;
+  &lt;li&gt;连接点：应用程序执行过程中插入切面的地点。
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-b9fd7336a3a4c292.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;连接点示意图&quot; /&gt;
+这里只看连接点的位置，至于通知类型会在后面介绍，还有异常通知，他会在你抛出异常时将通知插入进来。&lt;/li&gt;
+  &lt;li&gt;切入点：定义了通知应该应用在哪些连接点上，通知可以应用在aop框架支持的任何连接点。可以这样理解，切入点就是当通知插入到某个连接点时，这个连接点就成了切入点。&lt;/li&gt;
+  &lt;li&gt;引入：为类添加新方法和属性&lt;/li&gt;
+  &lt;li&gt;目标对象：被通知的对象，既可以是被通知的类，也可以是第三方类。&lt;/li&gt;
+  &lt;li&gt;代理：将通知应用到目标对象之后创建的对象，应用系统的其他部分不用为了支持代理对象而改变。&lt;/li&gt;
+  &lt;li&gt;织入：将切面应用到目标对象从而创建的一个新的对象的过程，织入发生在目标对象生命周期的多个点上。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;aop的实现&quot;&gt;aop的实现&lt;/h3&gt;
+&lt;p&gt;aop是通过生成代理对象来实现通知织入的。就像某个品牌的代理，这个品牌是被代理对象，下面有他们的代理商，而代理商需要通过品牌的授权才能代理，这里的品牌就像我们的被代理对象（firstDemo），而授权过程就是织入（applicationContext中配置），代理商就是代理对象（applicationContext中配置）。
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-2235aa8d735c0387.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;实现&quot; /&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;例子&quot;&gt;例子&lt;/h3&gt;
+&lt;p&gt;该例子使用前置通知来实现在调用类的方法前打印出时间。
+新建一个module,如下
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-c9ba2d727d677b95.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;aop&quot; /&gt;
+我们现在只用到NameDemo,MyMethodBeforeAdvice和FirstDemo这三个java文件，其余文件在后面用到。在FirstDemo中只有一个name属性和一个方法，代码如下。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class FirstDemo implements NameDemo{
+
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 该方法继承自NameDemo
+     */
+    @Override
+    public void printName() {
+        System.out.println(&quot;执行pringName &quot;+name);
+    }
+
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;NameDemo为接口，FirstDemo继承该接口，firstDemo中的方法就是继承自这里。
+MyMethodBeforeAdvice为前置通知，实现我们需要的功能（这里就是显示出调用时间）。代码如下。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class MyMethodBeforeAdvice implements MethodBeforeAdvice {
+    @Override
+    public void before(Method method, Object[] objects, Object o) throws Throwable {
+        System.out.println(&quot;--------------------------------------------------&quot;);
+        System.out.println(&quot;调用&quot;+method+&quot;的时间是&quot;+new Date());
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;现在我们就可以让firstDemo的方法在调用前打印出调用的时间。我们在applicationContext中做如下配置，产生代理对象，我们拿到代理对象就可以实现了。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;    &amp;lt;!--配置被代理对象--&amp;gt;
+    &amp;lt;bean id=&quot;firstDemo&quot; class=&quot;cn.pwc.demo.FirstDemo&quot;&amp;gt;
+        &amp;lt;property name=&quot;name&quot; value=&quot;xiaomao&quot;/&amp;gt;
+    &amp;lt;/bean&amp;gt;
+
+    &amp;lt;!--配置前置通知--&amp;gt;
+    &amp;lt;bean id=&quot;myMethodBeforeAdvice&quot; class=&quot;cn.pwc.demo.MyMethodBeforeAdvice&quot;/&amp;gt;
+
+    &amp;lt;!--配置代理对象--&amp;gt;
+    &amp;lt;bean id=&quot;proxyFactoryBean&quot; class=&quot;org.springframework.aop.framework.ProxyFactoryBean&quot;&amp;gt;
+        &amp;lt;!--代理接口集--&amp;gt;
+        &amp;lt;property name=&quot;proxyInterfaces&quot;&amp;gt;
+            &amp;lt;list&amp;gt;
+                &amp;lt;value&amp;gt;cn.pwc.demo.NameDemo&amp;lt;/value&amp;gt;
+            &amp;lt;/list&amp;gt;
+        &amp;lt;/property&amp;gt;
+        &amp;lt;!--通知名集--&amp;gt;
+        &amp;lt;property name=&quot;interceptorNames&quot;&amp;gt;
+            &amp;lt;list&amp;gt;
+                &amp;lt;value&amp;gt;myMethodBeforeAdvice&amp;lt;/value&amp;gt;
+            &amp;lt;/list&amp;gt;
+        &amp;lt;/property&amp;gt;
+        &amp;lt;!--代理哪些对象--&amp;gt;
+        &amp;lt;property name=&quot;target&quot; ref=&quot;firstDemo&quot;/&amp;gt;
+    &amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;我要进行代理肯定要知道代理的是什么（这里的前置通知）和代理谁（被代理对象），然后生成我们的代理对象。生成代理对象时我们需要将前面的通知和被代理对象配置进去。然后我们去test文件中进行测试&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static void main(String[] args){
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+        NameDemo demo = (NameDemo) applicationContext.getBean(&quot;proxyFactoryBean&quot;);
+        demo.printName();
+    }
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这里是不是有点不同，我们平时获取bean应该是
+`
+FirstDemo firstDemo = (FirstDemo) applicationContext.getBean(“firstDemo”);
+`
+如果这样获取那么我们刚才的代理操作完全白做了，取到的对象没有经过代理的渠道，自然也不会有通知织入进去，所以我们在获取bean的时候要获取代理对象。而且要注意的是我们这里获取到对象要转为接口对象。运行结果
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-425f4f278e2608fa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;结果&quot; /&gt;
+现在返回看刚才的定义，通知就是MyMethodBeforeAdvice类，切入点就是printName调用前，目标对象就是proxyFactoryBean。接下来来看看通知的类型。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;通知的类型&quot;&gt;通知的类型&lt;/h3&gt;
+&lt;p&gt;通知有五种类型。分别是前置通知，后置通知，环绕通知，异常通知和引入通知&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;前置通知就是在方法调用前调用通知类中的方法。
+```
+  /**
+  *
+    &lt;ul&gt;
+      &lt;li&gt;@param method  被调用的方法&lt;/li&gt;
+      &lt;li&gt;@param objects 给这个方法传递的参数&lt;/li&gt;
+      &lt;li&gt;@param o       目标对象&lt;/li&gt;
+      &lt;li&gt;@throws Throwable
+  */
+ @Override
+ public void before(Method method, Object[] objects, Object o) throws Throwable {
+ System.out.println(“————————————————–”);
+ System.out.println(“调用”+method+”的时间是”+new Date());
+ }
+```&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;后置通知就是在方法调用后调用通知类中的方法。
+```
+public class MyMethodAfterAdvice implements AfterReturningAdvice {
+ /**
+  *
+    &lt;ul&gt;
+      &lt;li&gt;@param o         被调用方法的返回值&lt;/li&gt;
+      &lt;li&gt;@param method    被调用的方法&lt;/li&gt;
+      &lt;li&gt;@param objects   被调用方法传的参数&lt;/li&gt;
+      &lt;li&gt;@param o1        目标对象&lt;/li&gt;
+      &lt;li&gt;@throws Throwable
+  */
+ @Override
+ public void afterReturning(Object o, Method method, Object[] objects, Object o1) throws Throwable {
+ System.out.println(“后置通知被调用啦”);
+ }
+}
+```&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;环绕通知，直接看代码注释
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class MyMethodInterceptor implements MethodInterceptor {
+ @Override
+ public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+     //被调用方法的方法体前的操作
+     System.out.println(&quot;环绕通知的前切入点&quot;);
+     //运行被调用方法的方法体
+     Object obj = methodInvocation.proceed();
+     //被调用方法的方法体后的操作
+     System.out.println(&quot;环绕通知的后切入点&quot;);
+     return obj;
+ }
+}
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;异常通知就是在发生异常时执行通知代码（我们手动在方法中抛错）
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class MyMethodThrowAdvice implements ThrowsAdvice {
+ public void afterThrowing(Throwable throwable){
+     System.out.println(&quot;异常通知被调用&quot;);
+ }
+}
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;前面4种通知测试一遍如图
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-1e8d31fb25ccb96d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;test&quot; /&gt;这里多出的一个方法是为了防止抛出错误之后后面的停止运行导致看不到环绕通知的后切入点和后置通知，现在的firstDemo代码为&lt;/p&gt;
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class FirstDemo implements NameDemo,AgeDemo {
+
+ private String name;
+
+ public String getName() {
+     return name;
+ }
+
+ public void setName(String name) {
+     this.name = name;
+ }
+
+ /**
+  * 该方法继承自NameDemo
+  */
+ @Override
+ public void printName() {
+     System.out.println(&quot;执行pringName &quot;+name);
+ }
+
+ @Override
+ public void printAge() {
+     System.out.println(&quot;我100岁啦！&quot;);
+     int i = 1/0;
+ }
+}
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+  &lt;/li&gt;
+  &lt;li&gt;引入通知 只需要在application中配置就行，比如我们的前置通知只对printName有效而对printAge无效，我们可以如下配置
+    &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;!--定义切入点--&amp;gt;
+ &amp;lt;bean id=&quot;before&quot; class=&quot;org.springframework.aop.support.NameMatchMethodPointcutAdvisor&quot;&amp;gt;
+     &amp;lt;property name=&quot;advice&quot; ref=&quot;myMethodBeforeAdvice&quot;/&amp;gt;
+     &amp;lt;property name=&quot;mappedNames&quot;&amp;gt;
+         &amp;lt;list&amp;gt;
+             &amp;lt;value&amp;gt;printName&amp;lt;/value&amp;gt;
+         &amp;lt;/list&amp;gt;
+     &amp;lt;/property&amp;gt;
+ &amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+    &lt;/div&gt;
+    &lt;p&gt;然后将配置对象中的通知名集的myMethodBeforeAdvice改为before，运行如下。
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-638e9e46a2859ae6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;结果&quot; /&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;源码地址：&lt;a href=&quot;https://github.com/pang-weichao/springDemo&quot;&gt;springDemo&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="spring" /><summary type="html">spring的aop概念及体验</summary></entry><entry><title type="html">spring 三bean的生命周期以及作用域</title><link href="http://localhost:4000/04-springThree/" rel="alternate" type="text/html" title="spring 三bean的生命周期以及作用域" /><published>2017-05-10T00:00:00+08:00</published><updated>2017-05-10T00:00:00+08:00</updated><id>http://localhost:4000/04-springThree</id><content type="html" xml:base="http://localhost:4000/04-springThree/">&lt;p&gt;spring中的bean也是有生命周期的，就像一个人从出生到死亡，中间会经历10岁，20岁… 那么对于spring中的bean他们就会经过一系列的方法。说生命周期之前我们还是先看bean的作用域&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;bean作用域&quot;&gt;bean作用域&lt;/h3&gt;
+&lt;p&gt;bean的作用域有几种类型，之前我们通过获取上下文的方式获取到applicationContext对象，在加载我们的spring的配置的时候我们就创建了bean，这种Bean的作用域是Singleton类型(没有在配置时更改作用域类型的bean)。除了这种方式可以去获取bean，我们还可以通过先获取beanFactory来获取bean，通过XmlBeanFactory()获取到beanFactory，但是这种方法在spring3.1之后就不用了，通过这种方式拿到的bean是propotype类型。除此之外还有request,session和global-session类型。后三个都是在java web中有效。
+singleton是单例类型，就是在创建起容器时就自动创建了一个bean的对象，不管你是否使用，他都存在了，每次获取到的对象都是同一个对象。
+propotype是原型类型，他在我们创建容器的时候并没有实例化，而是当我们获取bean的时候才会去创建一个对象。而且我们每次获取到的对象都不是同一个对象。
+下面用例子来看看作用域，首先我们创建如下图的module取名为life
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-82449c28bbed7a77.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;life&quot; /&gt;
+其中secondDemo，TypeTest是我们现在要用到的，其余的文件是下面生命周期用到的文件，secondDemo很简单,代码如下&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class SecondDemo {
+
+    private String secondDemo;
+
+    public SecondDemo() {
+        System.out.println(&quot;SecondDemo被创建&quot;);
+    }
+
+    public String getSecondDemo() {
+        return secondDemo;
+    }
+
+    public void setSecondDemo(String secondDemo) {
+        this.secondDemo = secondDemo;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;然后我们在applicationContext文件中配置bean，显示默认配置，不对作用域配置&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;bean id=&quot;secondDemo&quot; class=&quot;cn.pwc.demo.SecondDemo&quot;&amp;gt;
+    &amp;lt;property name=&quot;secondDemo&quot; value=&quot;我是第二个demo&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;然后我们在typeTest中进行测试&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+System.out.println(&quot;----------------------begin-------------------------&quot;);
+SecondDemo s1 = (SecondDemo) applicationContext.getBean(&quot;secondDemo&quot;);
+System.out.println(&quot;----------------------end-------------------------&quot;);
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;运行之后
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-63493273398d2656.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;singleton&quot; /&gt;
+构造函数的secondDemo是不是在begin之前打出来了也就意味着我们在取得对象之前这个对象就已经创建好了，然后我们改变他的作用于，将bean的配置改为
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-045c4856db2d5f42.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;修改之后配置bean&quot; /&gt;
+再次运行
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-076d57835cd85953.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;propertype&quot; /&gt;
+我们可以看到构造函数的secondDemo在begin和end之间打印出来了，这也就验证了对象的创建是在我们取得对象的时候创建的。对于多次取得的对象是否是同一个，我们可以在测试方法里稍加修改，propotype为
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-e6dba8e83f0d2b35.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;propertypr对象验证&quot; /&gt;
+singleton测试方法一样，看打印出来的地址
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-ae80300c61018102.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;singleton对象验证&quot; /&gt;
+好了，作用于就到这里，下面看生命周期。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;bean的生命周期&quot;&gt;bean的生命周期&lt;/h3&gt;
+&lt;p&gt;对于bean生命周期的验证我们就看module目录中的FirstDemo,MyBeanPostProcessor和test文件。由于容器在创建的时候bean对象就产生了，所以我们的test文件就一句ApplicationContext applicationContext = new ClassPathXmlApplicationContext(“applicationContext.xml”);就行了。
+我们给出生命周期的流程图，然后去看她的每个过程。
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-05bf2b9b2f2a01d4.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;生命周期&quot; /&gt;
+创建不多说了，就是使用构造函数来创建起对象。
+set，我们在配置bean的时候给对象注入了属性值，这里就是通过set方法注入属性值，是第二步
+BeanNameAware，这是一个接口，实现该接口，我们需要实现setBeanName方法，该方法的唯一参数就是我们现在在创建的对象的对象名。
+BeanFactoryAware，这也是一个接口，该接口的方法是setBeanFactory，该方法的参数将传入一个BeanFactory，该参数是bean工厂，里面有你配置的所有的bean。
+ApplicationContextAware，接口，里面有setApplicationContext方法，这个方法传入的参数是上下文对象。
+BeanPostProcessor（这里只执行before方法），接口，但是该接口不和其他接口一样，通过让firstDemo去继承实现它，而是新建一个类去继承BeanPostProcessor，然后通过去spring配置文件中配置这个新建的bean来关联其他bean来实现该接口。我们module中的MyBeanPostProcessor就实现了该接口。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class MyBeanPostProcessor implements BeanPostProcessor {
+    @Override
+    public Object postProcessBeforeInitialization(Object o, String s) throws BeansException {
+        System.out.println(&quot;postProcessBeforeInitialization被调用&quot;);
+        return o;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object o, String s) throws BeansException {
+        System.out.println(&quot;postProcessAfterInitialization被调用&quot;);
+        return o;
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;bean的配置&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;bean id=&quot;firstDemo&quot; class=&quot;cn.pwc.demo.FirstDemo&quot; init-method=&quot;myInit&quot; destroy-method=&quot;myDestroy&quot;&amp;gt;
+    &amp;lt;property name=&quot;name&quot; value=&quot;给firstDemo的值&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+
+&amp;lt;bean id=&quot;beanPost&quot; class=&quot;cn.pwc.demo.MyBeanPostProcessor&quot;/&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;该接口有before和after两个方法，在调用before之后并不马上调用after。中间还有两个初始化的过程。实现该接口的类有点像拦截器，就是和他关联的每个类都要通过这里，这里又给我们有点aop的影子，我们在这里可以对每个对象可以进行统一的操作。aop后面介绍。
+InitializingBean，接口，该接口有方法afterPropertiesSet，这里可以对对象进行一些初始化，除了这个接口可以初始化，下一步的方法也是初始化。
+自定义init方法，看上图的bean配置是不是和之前的有点不同，多了init-method，这是制定对该bean的对象进行初始化，初始化的方法是myInit，在firstDemo中实现该方法。
+BeanPostProcess（这里执行after方法）,这个接口在上面已经做了一些介绍。
+接下去就是使用了。
+使用完了容器销毁，释放资源。
+DisposableBean，接口，该接口有destroy方法，该方法是bean生命中的最后一步，执行一些资源的释放，不识闲该方法，我们还可以用另外一种实现方式。
+自定义的销毁方法，我们的firstDemo的配置除了多了init-method之外我们还多了destory-method，该属性指明我们在销毁的时候应该执行firstDemo中的哪个方法，这是bean的最后一步。
+最后我们运行test，出现下图
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-3aa6a4d009e10994.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;test&quot; /&gt;
+销毁方法看不到是因为容器已经销毁了，但确实是执行了。&lt;/p&gt;
+
+&lt;p&gt;源码地址：&lt;a href=&quot;https://github.com/pang-weichao/springDemo&quot;&gt;springDemo&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="spring" /><summary type="html">spring的生命周期问题</summary></entry><entry><title type="html">spring 二ioc di</title><link href="http://localhost:4000/03-springTwo/" rel="alternate" type="text/html" title="spring 二ioc di" /><published>2017-05-10T00:00:00+08:00</published><updated>2017-05-10T00:00:00+08:00</updated><id>http://localhost:4000/03-springTwo</id><content type="html" xml:base="http://localhost:4000/03-springTwo/">&lt;p&gt;spring的核心就是ioc和di,对于这两个概念我们这里还是再给出一遍或者可以看 &lt;a href=&quot;http://www.jianshu.com/p/97f18666232c&quot;&gt;spring一 简介&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;ioc(inverse of control) 控制反转，我们现在的创建对象实例都是通过new来创建，这样这个对象的创建权在于程序，但在spring中这个创建权给了spring，由spring来创建对象，这就是控制反转。&lt;/p&gt;
+
+&lt;p&gt;di(dependency injection)依赖注入，依赖注入就是在创建对象的时候注入对象的属性值。&lt;/p&gt;
+
+&lt;p&gt;对于ioc的理解，通过spring一的例子(创建对象的过程)应该有了一定的了解，那么我们我们就通过上次的module来看看ioc。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h3 id=&quot;ioc-控制反转&quot;&gt;ioc 控制反转&lt;/h3&gt;
+&lt;p&gt;我们在Test.java中通过new来创建一个对象，并通过set方法赋予name值。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static void main(String[] args){
+        FirstDemo firstDemo = new FirstDemo();
+        firstDemo.setDemoName(&quot;普通demoName&quot;);
+        firstDemo.printName();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这个方法应该都没问题，那么我们接下来用spring配置bean的方法取得对象。
+在applicationContext.xml中配置bean&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;bean id=&quot;firstDemo&quot; class=&quot;cn.pwc.demo.FirstDemo&quot;&amp;gt;
+     &amp;lt;property name=&quot;demoName&quot; value=&quot;spring的demoName&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;id就是我们spring创建的对象的名称，后面在获取对象的时候通过getBean(“id”)方法获取到我们的对象。class是我们的类，指定这个bean创建的是哪个对象。property是我们的属性值，这里可以赋予类中指定属性的值，name指定类中的哪个属性，value就是赋予的值（value可以用ref替换，ref将会在di介绍里出现）。比如我们这里，创建一个名为firstDemo的FirstDemo对象，该对象的demoName值为springName。bean就创建好了，接下来去获取。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public static void main(String[] args){
+     //获取spring容器的对象
+    ApplicationContext applicationContext = new ClassPathXmlApplicationContext(&quot;applicationContext.xml&quot;);
+    //取到对象
+    FirstDemo firstDemo = (FirstDemo) applicationContext.getBean(&quot;firstDemo&quot;);
+    //执行方法
+    firstDemo.printName();
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这里没什么好说的，看注释就行。
+这样我们也可以得到对象并执行对象的方法，现在再回想一下ioc的定义(控制反转)，对象的创建权是不是交给了spring了。&lt;/p&gt;
+
+&lt;h3 id=&quot;di-依赖注入&quot;&gt;di 依赖注入&lt;/h3&gt;
+&lt;p&gt;至于依赖注入，其实我们已经接触到了，比如上面我们在配置bean的时候，properties不就对一个属性注入了一个值吗。那么怎么来看这个依赖。
+我们在springDemo下新建一个module，取名为di。
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-0c19f886ffed7266.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;di&quot; /&gt;
+创建如图的项目结构，demo包下新建三个java文件，firstDemo和secondDemo里面有两个属性，name和thirdDemo。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;public class FirstDemo {
+
+    private String name;
+
+    private ThirdDemo td;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ThirdDemo getTd() {
+        return td;
+    }
+
+    public void setTd(ThirdDemo td) {
+        this.td = td;
+    }
+
+    public void printName(){
+        System.out.println(&quot;名字是 &quot; + name);
+        td.printName();
+    }
+}
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;而thirdDemo只有name属性。最主要来看bean的配置。&lt;/p&gt;
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;bean id=&quot;firstDemo&quot; class=&quot;cn.pwc.demo.FirstDemo&quot;&amp;gt;
+   &amp;lt;property name=&quot;name&quot; value=&quot;第一个demoName&quot;/&amp;gt;
+   &amp;lt;property name=&quot;td&quot; ref=&quot;thirdDemo&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+
+&amp;lt;bean id=&quot;secondDemo&quot; class=&quot;cn.pwc.demo.SecondDemo&quot;&amp;gt;
+    &amp;lt;property name=&quot;name&quot; value=&quot;第二个demoName&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+
+&amp;lt;bean id=&quot;thirdDemo&quot; class=&quot;cn.pwc.demo.ThirdDemo&quot;&amp;gt;
+    &amp;lt;property name=&quot;name&quot; value=&quot;第三个demoName&quot;/&amp;gt;
+&amp;lt;/bean&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这里我们给firstDemo两个属性值都注入了值，而secondDemo只注入了name值，这样也就意味着secondDemo并没有拿到thirdDemo的对象也就不能调用thirdDemo的方法。而我们的firstDemo注入了thirdDemo对象，通过ref来进行注入，属性的值是一个具体对象的我们就要通过ref来注入。现在我们就可以说firstDemo依赖与thirdDemo了，你现在能删thirdDemo这个bean吗，不能。因为有一个对象在创建时需要将thirdDemo对象实例注入给他的属性，我们现在就可以说firstDemo依赖于thirdDemo了。通过test.java就可以看出确实firstDemo拿到了thirdDemo对象而secondDemo并没有拿到。
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-c3fb186cdaeea980.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;test&quot; /&gt;
+下面说三个不是很确定的点，都是我自己这么认为的，不知道对错。
+1 spring如何通过配置创建我们想要得到的实例
+通过java的反射机制来创建这些的bean实例
+2 注入是通过bean的set方法注入的
+当我们不写属性的set方法时我们是注入不进去属性值的
+3 applicationContext这个容器到底是什么样的，可以让我们拿到bean
+他应该像是一个hash表，有一个key和value,我们通过key值来取得value。&lt;/p&gt;
+
+&lt;p&gt;源码地址：&lt;a href=&quot;https://github.com/pang-weichao/springDemo&quot;&gt;springDemo&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="spring" /><summary type="html">spring的ioc和di体验</summary></entry><entry><title type="html">spring 一简介</title><link href="http://localhost:4000/02-springOne/" rel="alternate" type="text/html" title="spring 一简介" /><published>2017-05-10T00:00:00+08:00</published><updated>2017-05-10T00:00:00+08:00</updated><id>http://localhost:4000/02-springOne</id><content type="html" xml:base="http://localhost:4000/02-springOne/">&lt;p&gt;写spring是为了对spring学习的记录，刚开始接触spring一头雾水，因为直接看到的是各种配置，注解，难以理解。而且从最基础的讲解的资料看到的不是很多。废话不说了。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;h2 id=&quot;spring是什么&quot;&gt;spring是什么？&lt;/h2&gt;
+&lt;p&gt;spring是一个框架，一个容器框架，何谓容器？容器就是一个给你放东西的物体，那么sping里面放了什么，spring里面放了bean（准确讲是在spring中配置bean），但spring这个容器不仅仅可以配置bean，他还可以维护bean之间的的关系，这里面涉及到了ioc和di。&lt;/p&gt;
+&lt;h2 id=&quot;spring的三个重要概念&quot;&gt;spring的三个重要概念。&lt;/h2&gt;
+&lt;p&gt;bean 是什么？
+bean可以是任何的一个java对象，比如javabean，service，dao…
+ioc 是什么？
+ioc(inverse of control) 控制反转，我们现在的创建对象实例都是通过new来创建，这样这个对象的创建权在于程序，但在spring中这个创建权给了spring，由spring来创建对象，这就是控制反转。
+di 是什么？
+di(dependency injection)依赖注入，依赖注入就是在创建对象的时候注入对象的属性值。&lt;/p&gt;
+
+&lt;p&gt;ioc和di是spring的核心，这样讲一下肯定理解不了，结合后面的例子来理解。&lt;/p&gt;
+
+&lt;h2 id=&quot;从整体上来看spring&quot;&gt;从整体上来看spring&lt;/h2&gt;
+&lt;p&gt;我们现在觉得spring还是非常的空洞，尽管我们知道了spring是什么。但是他处在项目的哪里？比如我们的mybatis,hibernate就在我们的持久层，spring mvc,struts处在控制层。那么我们的spring在哪？spring非常的大，上面说了，spring是配置bean以及维护bean之间的关系。而bean又可以是任何的一个java对象，所以spring的一个感觉就是大。为了直观看下图。
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-a03614770bf7566e.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;spring.png&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;初体验例子&quot;&gt;初体验例子&lt;/h2&gt;
+&lt;p&gt;例子的实现目的是通过比较普通的创建对象与通过从spring中取得对象实现上有什么不同，来初步体会spring。
+实现过程：
+1.先如图创建一个web项目
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-242db6964ca9640b.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;项目整体图&quot; /&gt;
+创建一个springDemo的java项目，再在这个项目中创建一个introduce的module。然后我们为了使用spring需要引入commons-logging的jar包和spring的jar包&lt;/p&gt;
+
+&lt;p&gt;2.如图创建目录结构
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-66a37c1cb8819441.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;introduce module&quot; /&gt;
+FirstDemo的作用是作为测试对象，Test和TestSpring作用分别是通过new来创建FirstDemo和去spring中取得FirstDemo对象。applicationContext.xml是spring的配置文件，bean的配置以及bean之间的维护就在这里进行。&lt;/p&gt;
+
+&lt;p&gt;3.测试结果
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-e092cee6fa609c33.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;普通获取&quot; /&gt;
+&lt;img src=&quot;http://upload-images.jianshu.io/upload_images/4638441-7dbb71292d61f6cc.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240&quot; alt=&quot;spring获取&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这里就不具体贴出代码细节了，需要的可以自行下载。
+源码地址：&lt;a href=&quot;https://github.com/pang-weichao/springDemo&quot;&gt;springDemo&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="spring" /><summary type="html">spring的概念及初体验</summary></entry><entry><title type="html">javaMail的简单封装</title><link href="http://localhost:4000/01-javaMail/" rel="alternate" type="text/html" title="javaMail的简单封装" /><published>2017-04-26T00:00:00+08:00</published><updated>2017-04-26T00:00:00+08:00</updated><id>http://localhost:4000/01-javaMail</id><content type="html" xml:base="http://localhost:4000/01-javaMail/">&lt;p&gt;javamail是Sun发布的用来处理email的API。javamail api有几个核心类，分别是Session,Message,Address,Authenticator,Transport,Store,Folder,MimeMessage,InternetAddress.关于这些的介绍肯定是api文档介绍的详细或者上网随便一搜一大片。&lt;/p&gt;
 
 &lt;p&gt;接下来简单说一下封装之前的步骤以及一个我在封装过程中遇到的问题，网上对于这个问题的一些答案感觉有点问题。&lt;/p&gt;
 
@@ -16,485 +546,4 @@
 
 &lt;p&gt;其实这个问题只要你开启了ssl加密之后就会解决，而对于163邮箱来说没有这个ssl加密也可以正常运行。对于邮箱是否需要ssl加密，我只试了163和qq，qq需要163不需要。&lt;/p&gt;
 
-&lt;p&gt;最后放上源码地址:&lt;a href=&quot;https://github.com/pang-weichao/javamailDemo&quot;&gt;javaMail源码&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="javaMail" /><summary type="html">邮件封装的简单封装</summary></entry><entry><title type="html">Moon Jekyll Theme</title><link href="http://localhost:4000/moon-theme/" rel="alternate" type="text/html" title="Moon Jekyll Theme" /><published>2016-04-06T00:00:00+08:00</published><updated>2016-04-06T00:00:00+08:00</updated><id>http://localhost:4000/moon-theme</id><content type="html" xml:base="http://localhost:4000/moon-theme/">&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509720/61c61058-01d6-11e6-93ab-0918515ecd56.png&quot; alt=&quot;Moon Homepage&quot; /&gt;&lt;/p&gt;
-
-&lt;center&gt;&lt;b&gt;Moon&lt;/b&gt; is a minimal, one column jekyll theme.&lt;/center&gt;
-
-&lt;p&gt;I’m not a developer or designer. And I don’t add footer to show who did this theme. If you like this theme or using it, please give a &lt;strong&gt;star&lt;/strong&gt; for motivation, It makes me happy.&lt;/p&gt;
-
-&lt;iframe src=&quot;https://ghbtns.com/github-btn.html?user=TaylanTatli&amp;amp;repo=Moon&amp;amp;type=star&amp;amp;count=true&amp;amp;size=large&quot; frameborder=&quot;0&quot; scrolling=&quot;0&quot; width=&quot;160px&quot; height=&quot;30px&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
-&lt;ul&gt;
-  &lt;li&gt;Fork the &lt;a href=&quot;https://github.com/TaylanTatli/Moon/fork&quot;&gt;Moon repo&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;Edit &lt;code class=&quot;highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt; file.&lt;/li&gt;
-  &lt;li&gt;Remove sample posts from &lt;code class=&quot;highlighter-rouge&quot;&gt;_posts&lt;/code&gt; folder and add yours.&lt;/li&gt;
-  &lt;li&gt;Edit &lt;code class=&quot;highlighter-rouge&quot;&gt;index.md&lt;/code&gt; file in &lt;code class=&quot;highlighter-rouge&quot;&gt;about&lt;/code&gt; folder.&lt;/li&gt;
-  &lt;li&gt;Change repo name to &lt;code class=&quot;highlighter-rouge&quot;&gt;YourUserName.github.io&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;That’s all.&lt;/p&gt;
-
-&lt;h2 id=&quot;preview&quot;&gt;Preview&lt;/h2&gt;
-
-&lt;figure class=&quot;third&quot;&gt;
-    
-    &lt;a href=&quot;https://cloud.githubusercontent.com/assets/754514/14509716/61ac6c8e-01d6-11e6-879f-8308883de790.png&quot;&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509716/61ac6c8e-01d6-11e6-879f-8308883de790.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;a href=&quot;https://cloud.githubusercontent.com/assets/754514/14509717/61ad05ae-01d6-11e6-85ae-5a817dd8763b.png&quot;&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509717/61ad05ae-01d6-11e6-85ae-5a817dd8763b.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;a href=&quot;https://cloud.githubusercontent.com/assets/754514/14509714/61a89708-01d6-11e6-8fcd-74b002a060df.png&quot;&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509714/61a89708-01d6-11e6-8fcd-74b002a060df.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;figcaption&gt;Screenshots of Moon Theme&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;hr /&gt;
-
-&lt;figure class=&quot;half&quot;&gt;
-    
-    &lt;a href=&quot;https://cloud.githubusercontent.com/assets/754514/14509718/61b09a20-01d6-11e6-8da1-4202ae4d83cd.png&quot;&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509718/61b09a20-01d6-11e6-8da1-4202ae4d83cd.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;a href=&quot;https://cloud.githubusercontent.com/assets/754514/14509715/61aa9d00-01d6-11e6-81a6-c6837edf2e84.png&quot;&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509715/61aa9d00-01d6-11e6-81a6-c6837edf2e84.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;figcaption&gt;Moon Theme on Small Screen Size&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;See a &lt;a href=&quot;http://taylantatli.github.io/Moon&quot;&gt;live version of Moon&lt;/a&gt; hosted on GitHub.&lt;/p&gt;
-
-&lt;h2 id=&quot;site-setup&quot;&gt;Site Setup&lt;/h2&gt;
-&lt;p&gt;A quick checklist of the files you’ll want to edit to get up and running.&lt;/p&gt;
-
-&lt;h3 id=&quot;site-wide-configuration&quot;&gt;Site Wide Configuration&lt;/h3&gt;
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt; is your friend. Open it up and personalize it. Most variables are self explanatory but here’s an explanation of each if needed:&lt;/p&gt;
-
-&lt;h4 id=&quot;title&quot;&gt;title&lt;/h4&gt;
-
-&lt;p&gt;The title of your site… shocker!&lt;/p&gt;
-
-&lt;p&gt;Example &lt;code class=&quot;highlighter-rouge&quot;&gt;title: My Awesome Site&lt;/code&gt;&lt;/p&gt;
-
-&lt;h4 id=&quot;bio&quot;&gt;bio&lt;/h4&gt;
-
-&lt;p&gt;The description to show on your homepage.&lt;/p&gt;
-
-&lt;h4 id=&quot;description&quot;&gt;description&lt;/h4&gt;
-
-&lt;p&gt;The description to use for meta tags and navigation menu.&lt;/p&gt;
-
-&lt;h4 id=&quot;url&quot;&gt;url&lt;/h4&gt;
-
-&lt;p&gt;Used to generate absolute urls in &lt;code class=&quot;highlighter-rouge&quot;&gt;sitemap.xml&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;feed.xml&lt;/code&gt;, and for generating canonical URLs in &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;head&amp;gt;&lt;/code&gt;. When developing locally either comment this out or use something like &lt;code class=&quot;highlighter-rouge&quot;&gt;http://localhost:4000&lt;/code&gt; so all assets load properly. &lt;em&gt;Don’t include a trailing &lt;code class=&quot;highlighter-rouge&quot;&gt;/&lt;/code&gt;&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Examples:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://taylantatli.me/Moon&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://localhost:4000&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;//cooldude.github.io&lt;/span&gt;
-&lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;h4 id=&quot;reading_time&quot;&gt;reading_time&lt;/h4&gt;
-
-&lt;p&gt;Set true to show reading time for posts. And set &lt;code class=&quot;highlighter-rouge&quot;&gt;words_per_minute&lt;/code&gt;, default is 200.&lt;/p&gt;
-
-&lt;h4 id=&quot;logo&quot;&gt;logo&lt;/h4&gt;
-&lt;p&gt;Your site’s logo. It will show on homepage and navigation menu. Also used for twitter meta tags.&lt;/p&gt;
-
-&lt;h4 id=&quot;background&quot;&gt;background&lt;/h4&gt;
-&lt;p&gt;Image for background. If you don’t set it, color will be used as a background.&lt;/p&gt;
-
-&lt;h4 id=&quot;google-analytics-and-webmaster-tools&quot;&gt;Google Analytics and Webmaster Tools&lt;/h4&gt;
-
-&lt;p&gt;Google Analytics UA and Webmaster Tool verification tags can be entered in &lt;code class=&quot;highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt;. For more information on obtaining these meta tags check &lt;a href=&quot;http://support.google.com/webmasters/bin/answer.py?hl=en&amp;amp;answer=35179&quot;&gt;Google Webmaster Tools&lt;/a&gt; and &lt;a href=&quot;https://ssl.bing.com/webmaster/configure/verify/ownership&quot;&gt;Bing Webmaster Tools&lt;/a&gt; support.&lt;/p&gt;
-
-&lt;h4 id=&quot;mathjax&quot;&gt;MathJax&lt;/h4&gt;
-&lt;p&gt;It’s enabled. But if you don’t want to use it. Set it false in  &lt;code class=&quot;highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h4 id=&quot;disqus-comments&quot;&gt;Disqus Comments&lt;/h4&gt;
-&lt;p&gt;Set your disqus shortname in &lt;code class=&quot;highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt; to use comments.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h3 id=&quot;navigation-links&quot;&gt;Navigation Links&lt;/h3&gt;
-
-&lt;p&gt;To set what links appear in the top navigation edit &lt;code class=&quot;highlighter-rouge&quot;&gt;_data/navigation.yml&lt;/code&gt;. Use the following format to set the URL and title for as many links as you’d like. &lt;em&gt;External links will open in a new window.&lt;/em&gt;&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Home&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Blog&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/blog/&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Projects&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/projects/&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;About&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/about/&lt;/span&gt;
-
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Moon&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http://taylantatli.me/Moon&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;layouts-and-content&quot;&gt;Layouts and Content&lt;/h2&gt;
-
-&lt;p&gt;Moon Theme use &lt;a href=&quot;https://github.com/penibelst/jekyll-compress-html&quot;&gt;Jekyll Compress&lt;/a&gt; to compress html output. But it can cause errors if you use “linenos” (line numbers). I suggest don’t use line numbers for codes, because it won’t look good with this theme, also i didn’t give a proper style for them. If you insist to use line numbers, just remove &lt;code class=&quot;highlighter-rouge&quot;&gt;layout: compress&lt;/code&gt; string from layouts. It will disable compressing.&lt;/p&gt;
-
-&lt;h3 id=&quot;feature-image&quot;&gt;Feature Image&lt;/h3&gt;
-
-&lt;p&gt;You can set feature image per post. Just add &lt;code class=&quot;highlighter-rouge&quot;&gt;feature: some link&lt;/code&gt; to your post’s front matter.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;feature: /assets/img/some-image.png
-or
-feaure: http://example.com/some-image.png
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-&lt;p&gt;This also will be used for twitter card:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;https://cloud.githubusercontent.com/assets/754514/14509719/61c5751c-01d6-11e6-8c29-ce8ccad149bf.png&quot; alt=&quot;Moon Twitter Card&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;comments&quot;&gt;Comments&lt;/h3&gt;
-&lt;p&gt;To show disqus comments for your post add &lt;code class=&quot;highlighter-rouge&quot;&gt;comments: true&lt;/code&gt; to your post’s front matter.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;questions&quot;&gt;Questions?&lt;/h2&gt;
-
-&lt;p&gt;Found a bug or aren’t quite sure how something works? By all means &lt;a href=&quot;https://github.com/TaylanTatli/Moon/issues/new&quot;&gt;file a GitHub Issue&lt;/a&gt;. And if you make something cool with this theme feel free to let me know.&lt;/p&gt;
-
-&lt;hr /&gt;
-
-&lt;h2 id=&quot;license&quot;&gt;License&lt;/h2&gt;
-
-&lt;p&gt;This theme is free and open source software, distributed under the MIT License. So feel free to use this Jekyll theme on your site without linking back to me or including a disclaimer.&lt;/p&gt;</content><author><name></name></author><category term="jekyll" /><category term="moon" /><category term="blog" /><category term="about" /><category term="theme" /><summary type="html">Minimal, one column Jekyll theme for your blog.</summary></entry><entry><title type="html">Markdown Syntax</title><link href="http://localhost:4000/markdown-syntax/" rel="alternate" type="text/html" title="Markdown Syntax" /><published>2016-03-15T00:00:00+08:00</published><updated>2016-03-15T00:00:00+08:00</updated><id>http://localhost:4000/markdown-syntax</id><content type="html" xml:base="http://localhost:4000/markdown-syntax/">&lt;h2 id=&quot;html-elements&quot;&gt;HTML Elements&lt;/h2&gt;
-
-&lt;p&gt;Below is just about everything you’ll need to style in the theme. Check the source code to see the many embedded elements within paragraphs.&lt;/p&gt;
-
-&lt;h1 id=&quot;heading-1&quot;&gt;Heading 1&lt;/h1&gt;
-
-&lt;h2 id=&quot;heading-2&quot;&gt;Heading 2&lt;/h2&gt;
-
-&lt;h3 id=&quot;heading-3&quot;&gt;Heading 3&lt;/h3&gt;
-
-&lt;h4 id=&quot;heading-4&quot;&gt;Heading 4&lt;/h4&gt;
-
-&lt;h5 id=&quot;heading-5&quot;&gt;Heading 5&lt;/h5&gt;
-
-&lt;h6 id=&quot;heading-6&quot;&gt;Heading 6&lt;/h6&gt;
-
-&lt;h3 id=&quot;body-text&quot;&gt;Body text&lt;/h3&gt;
-
-&lt;p&gt;Lorem ipsum dolor sit amet, test link adipiscing elit. &lt;strong&gt;This is strong&lt;/strong&gt;. Nullam dignissim convallis est. Quisque aliquam.&lt;/p&gt;
-
-&lt;p class=&quot;image-right&quot;&gt;&lt;img src=&quot;https://mmistakes.github.io/minimal-mistakes/images/3953273590_704e3899d5_m.jpg&quot; alt=&quot;Smithsonian Image&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;em&gt;This is emphasized&lt;/em&gt;. Donec faucibus. Nunc iaculis suscipit dui. 53 = 125. Water is H2O. Nam sit amet sem. Aliquam libero nisi, imperdiet at, tincidunt nec, gravida vehicula, nisl. The New York Times (That’s a citation). Underline.Maecenas ornare tortor. Donec sed tellus eget sapien fringilla nonummy. Mauris a ante. Suspendisse quam sem, consequat at, commodo vitae, feugiat in, nunc. Morbi imperdiet augue quis tellus.&lt;/p&gt;
-
-&lt;p&gt;HTML and CSS are our tools. Mauris a ante. Suspendisse quam sem, consequat at, commodo vitae, feugiat in, nunc. Morbi imperdiet augue quis tellus. Praesent mattis, massa quis luctus fermentum, turpis mi volutpat justo, eu volutpat enim diam eget metus.&lt;/p&gt;
-
-&lt;h3 id=&quot;blockquotes&quot;&gt;Blockquotes&lt;/h3&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Lorem ipsum dolor sit amet, test link adipiscing elit. Nullam dignissim convallis est. Quisque aliquam.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;list-types&quot;&gt;List Types&lt;/h2&gt;
-
-&lt;h3 id=&quot;ordered-lists&quot;&gt;Ordered Lists&lt;/h3&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;Item one
-    &lt;ol&gt;
-      &lt;li&gt;sub item one&lt;/li&gt;
-      &lt;li&gt;sub item two&lt;/li&gt;
-      &lt;li&gt;sub item three&lt;/li&gt;
-    &lt;/ol&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Item two&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;unordered-lists&quot;&gt;Unordered Lists&lt;/h3&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Item one&lt;/li&gt;
-  &lt;li&gt;Item two&lt;/li&gt;
-  &lt;li&gt;Item three&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;tables&quot;&gt;Tables&lt;/h2&gt;
-
-&lt;table rules=&quot;groups&quot;&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;Header1&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;Header2&lt;/th&gt;
-      &lt;th style=&quot;text-align: right&quot;&gt;Header3&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;cell1&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;cell2&lt;/td&gt;
-      &lt;td style=&quot;text-align: right&quot;&gt;cell3&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;cell4&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;cell5&lt;/td&gt;
-      &lt;td style=&quot;text-align: right&quot;&gt;cell6&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;cell1&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;cell2&lt;/td&gt;
-      &lt;td style=&quot;text-align: right&quot;&gt;cell3&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;cell4&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;cell5&lt;/td&gt;
-      &lt;td style=&quot;text-align: right&quot;&gt;cell6&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-  &lt;tfoot&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;Foot1&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;Foot2&lt;/td&gt;
-      &lt;td style=&quot;text-align: right&quot;&gt;Foot3&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tfoot&gt;
-&lt;/table&gt;
-
-&lt;h2 id=&quot;code-snippets&quot;&gt;Code Snippets&lt;/h2&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-css&quot; data-lang=&quot;css&quot;&gt;&lt;span class=&quot;nf&quot;&gt;#container&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-  &lt;span class=&quot;nl&quot;&gt;float&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;left&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;nl&quot;&gt;margin&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;-240px&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-  &lt;span class=&quot;nl&quot;&gt;width&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;100%&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;h2 id=&quot;buttons&quot;&gt;Buttons&lt;/h2&gt;
-
-&lt;p&gt;Make any link standout more when applying the &lt;code class=&quot;highlighter-rouge&quot;&gt;.btn&lt;/code&gt; class.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;a&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;href=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;#&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;btn btn-success&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Success Button&lt;span class=&quot;nt&quot;&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;div&gt;&lt;a href=&quot;#&quot; class=&quot;btn&quot;&gt;Primary Button&lt;/a&gt;&lt;/div&gt;
-&lt;div&gt;&lt;a href=&quot;#&quot; class=&quot;btn btn-success&quot;&gt;Success Button&lt;/a&gt;&lt;/div&gt;
-&lt;div&gt;&lt;a href=&quot;#&quot; class=&quot;btn btn-warning&quot;&gt;Warning Button&lt;/a&gt;&lt;/div&gt;
-&lt;div&gt;&lt;a href=&quot;#&quot; class=&quot;btn btn-danger&quot;&gt;Danger Button&lt;/a&gt;&lt;/div&gt;
-&lt;div&gt;&lt;a href=&quot;#&quot; class=&quot;btn btn-info&quot;&gt;Info Button&lt;/a&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;kbd&quot;&gt;KBD&lt;/h2&gt;
-
-&lt;p&gt;You can also use &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;kbd&amp;gt;&lt;/code&gt; tag for keyboard buttons.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;kbd&amp;gt;&lt;/span&gt;W&lt;span class=&quot;nt&quot;&gt;&amp;lt;/kbd&amp;gt;&amp;lt;kbd&amp;gt;&lt;/span&gt;A&lt;span class=&quot;nt&quot;&gt;&amp;lt;/kbd&amp;gt;&amp;lt;kbd&amp;gt;&lt;/span&gt;S&lt;span class=&quot;nt&quot;&gt;&amp;lt;/kbd&amp;gt;&amp;lt;kbd&amp;gt;&lt;/span&gt;D&lt;span class=&quot;nt&quot;&gt;&amp;lt;/kbd&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Press &lt;kbd&gt;W&lt;/kbd&gt;&lt;kbd&gt;A&lt;/kbd&gt;&lt;kbd&gt;S&lt;/kbd&gt;&lt;kbd&gt;D&lt;/kbd&gt; to move your car. &lt;strong&gt;Midtown Maddness!!&lt;/strong&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;notices&quot;&gt;Notices&lt;/h2&gt;
-
-&lt;p class=&quot;notice&quot;&gt;&lt;strong&gt;Watch out!&lt;/strong&gt; You can also add notices by appending &lt;code class=&quot;highlighter-rouge&quot;&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;err&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;.notice&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;&lt;/code&gt; to a paragraph.&lt;/p&gt;</content><author><name></name></author><category term="markdown" /><category term="syntax" /><category term="sample" /><category term="test" /><category term="jekyll" /><summary type="html">Just about everything you'll need to style in the theme: headings, paragraphs, blockquotes, tables, code blocks, and more.</summary></entry><entry><title type="html">A Post with a Video</title><link href="http://localhost:4000/video-post/" rel="alternate" type="text/html" title="A Post with a Video" /><published>2016-03-15T00:00:00+08:00</published><updated>2016-03-15T00:00:00+08:00</updated><id>http://localhost:4000/video-post</id><content type="html" xml:base="http://localhost:4000/video-post/">&lt;iframe width=&quot;560&quot; height=&quot;315&quot; src=&quot;//www.youtube.com/embed/SU3kYxJmWuQ&quot; frameborder=&quot;0&quot;&gt; &lt;/iframe&gt;
-
-&lt;p&gt;Video embeds are responsive and scale with the width of the main content block with the help of &lt;a href=&quot;http://fitvidsjs.com/&quot;&gt;FitVids&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;Not sure if this only effects Kramdown or if it’s an issue with Markdown in general. But adding YouTube video embeds causes errors when building your Jekyll site. To fix add a space between the &lt;code class=&quot;highlighter-rouge&quot;&gt;&amp;lt;iframe&amp;gt;&lt;/code&gt; tags and remove &lt;code class=&quot;highlighter-rouge&quot;&gt;allowfullscreen&lt;/code&gt;. Example below:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;iframe&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;width=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;560&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;height=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;315&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;//www.youtube.com/embed/SU3kYxJmWuQ&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;frameborder=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;&amp;lt;/iframe&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;</content><author><name></name></author><category term="sample" /><category term="post" /><category term="video" /><summary type="html">Custom written post descriptions are the way to go... if you're not lazy.</summary></entry><entry><title type="html">MathJax Example</title><link href="http://localhost:4000/mathjax-example/" rel="alternate" type="text/html" title="MathJax Example" /><published>2015-08-10T00:00:00+08:00</published><updated>2015-08-10T00:00:00+08:00</updated><id>http://localhost:4000/mathjax-example</id><content type="html" xml:base="http://localhost:4000/mathjax-example/">&lt;p&gt;&lt;a href=&quot;http://www.mathjax.org/&quot;&gt;MathJax&lt;/a&gt; is a simple way of including Tex/LaTex/MathML based mathematics in HTML webpages. To get up and running you need to include the MathJax script in the header of your github pages page, and then write some maths. For LaTex, there are two delimiters you need to know about, one for block or displayed mathematics &lt;code class=&quot;highlighter-rouge&quot;&gt;\[ ... \]&lt;/code&gt;, and the other for inline mathematics &lt;code class=&quot;highlighter-rouge&quot;&gt;\( ... \)&lt;/code&gt;.&lt;/p&gt;
-
-&lt;h2 id=&quot;usage&quot;&gt;Usage&lt;/h2&gt;
-
-&lt;p&gt;To enable MathJax support be sure Kramdown is your Markdown flavor of choice and MathJax is set to true in your &lt;code class=&quot;highlighter-rouge&quot;&gt;_config.yml&lt;/code&gt; file.&lt;/p&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;markdown: kramdown
-mathjax: true
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Here is an example MathJax inline rendering \\( 1/x^{2} \\), and here is a block rendering: 
-\\[ \frac{1}{n^{2}} \\]
-&lt;/code&gt;&lt;/pre&gt;
-&lt;/div&gt;
-
-&lt;p&gt;Here is an example MathJax inline rendering \( 1/x^{2} \), and here is a block rendering: 
-\[ \frac{1}{n^{2}} \]&lt;/p&gt;
-
-&lt;p&gt;The only thing to look out for is the escaping of the backslash when using markdown, so the delimiters become &lt;code class=&quot;highlighter-rouge&quot;&gt;\\[ ... \\]&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;\\( ... \\)&lt;/code&gt; for inline and block maths respectively.&lt;/p&gt;
-
-&lt;script type=&quot;math/tex; mode=display&quot;&gt;% &lt;![CDATA[
-\begin{align*}
-  &amp; \phi(x,y) = \phi \left(\sum_{i=1}^n x_ie_i, \sum_{j=1}^n y_je_j \right)
-  = \sum_{i=1}^n \sum_{j=1}^n x_i y_j \phi(e_i, e_j) = \\
-  &amp; (x_1, \ldots, x_n) \left( \begin{array}{ccc}
-      \phi(e_1, e_1) &amp; \cdots &amp; \phi(e_1, e_n) \\
-      \vdots &amp; \ddots &amp; \vdots \\
-      \phi(e_n, e_1) &amp; \cdots &amp; \phi(e_n, e_n)
-    \end{array} \right)
-  \left( \begin{array}{c}
-      y_1 \\
-      \vdots \\
-      y_n
-    \end{array} \right)
-\end{align*} %]]&gt;&lt;/script&gt;</content><author><name></name></author><category term="markdown" /><category term="mathjax" /><category term="example" /><category term="test" /><category term="jekyll" /><summary type="html">MathJax Example for Moon Jekyll Theme.</summary></entry><entry><title type="html">A Post with Images</title><link href="http://localhost:4000/sample-post-images/" rel="alternate" type="text/html" title="A Post with Images" /><published>2013-05-22T00:00:00+08:00</published><updated>2013-05-22T00:00:00+08:00</updated><id>http://localhost:4000/sample-post-images</id><content type="html" xml:base="http://localhost:4000/sample-post-images/">&lt;p&gt;Here are some examples of what a post with images might look like. If you want to display two or three images next to each other responsively use &lt;code class=&quot;highlighter-rouge&quot;&gt;figure&lt;/code&gt; with the appropriate &lt;code class=&quot;highlighter-rouge&quot;&gt;class&lt;/code&gt;. Each instance of &lt;code class=&quot;highlighter-rouge&quot;&gt;figure&lt;/code&gt; is auto-numbered and displayed in the caption.&lt;/p&gt;
-
-&lt;h3 id=&quot;figures-for-images-or-video&quot;&gt;Figures (for images or video)&lt;/h3&gt;
-
-&lt;h4 id=&quot;one-up&quot;&gt;One Up&lt;/h4&gt;
-
-&lt;figure&gt;
-	&lt;a href=&quot;http://farm9.staticflickr.com/8426/7758832526_cc8f681e48_b.jpg&quot;&gt;&lt;img src=&quot;http://farm9.staticflickr.com/8426/7758832526_cc8f681e48_c.jpg&quot; /&gt;&lt;/a&gt;
-	&lt;figcaption&gt;&lt;a href=&quot;http://www.flickr.com/photos/80901381@N04/7758832526/&quot; title=&quot;Morning Fog Emerging From Trees by A Guy Taking Pictures, on Flickr&quot;&gt;Morning Fog Emerging From Trees by A Guy Taking Pictures, on Flickr&lt;/a&gt;.&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;p&gt;Vero laborum commodo occupy. Semiotics voluptate mumblecore pug. Cosby sweater ullamco quinoa ennui assumenda, sapiente occupy delectus lo-fi. Ea fashion axe Marfa cillum aliquip. Retro Bushwick keytar cliche. Before they sold out sustainable gastropub Marfa readymade, ethical Williamsburg skateboard brunch qui consectetur gentrify semiotics. Mustache cillum irony, fingerstache magna pour-over keffiyeh tousled selfies.&lt;/p&gt;
-
-&lt;h4 id=&quot;two-up&quot;&gt;Two Up&lt;/h4&gt;
-
-&lt;p&gt;Apply the &lt;code class=&quot;highlighter-rouge&quot;&gt;half&lt;/code&gt; class like so to display two images side by side that share the same caption.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;figure&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;half&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;a&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;href=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/images/image-filename-1-large.jpg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;img&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/images/image-filename-1.jpg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;a&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;href=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/images/image-filename-2-large.jpg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;img&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/images/image-filename-2.jpg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/a&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;figcaption&amp;gt;&lt;/span&gt;Caption describing these two images.&lt;span class=&quot;nt&quot;&gt;&amp;lt;/figcaption&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/figure&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;And you’ll get something that looks like this:&lt;/p&gt;
-
-&lt;figure class=&quot;half&quot;&gt;
-	&lt;a href=&quot;http://placehold.it/1200x600.JPG&quot;&gt;&lt;img src=&quot;http://placehold.it/600x300.jpg&quot; /&gt;&lt;/a&gt;
-	&lt;a href=&quot;http://placehold.it/1200x600.jpeg&quot;&gt;&lt;img src=&quot;http://placehold.it/600x300.jpg&quot; /&gt;&lt;/a&gt;
-	&lt;figcaption&gt;Two images.&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h4 id=&quot;three-up&quot;&gt;Three Up&lt;/h4&gt;
-
-&lt;p&gt;Apply the &lt;code class=&quot;highlighter-rouge&quot;&gt;third&lt;/code&gt; class like so to display three images side by side that share the same caption.&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-html&quot; data-lang=&quot;html&quot;&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;figure&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;class=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;third&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;img&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/images/image-filename-1.jpg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;img&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/images/image-filename-2.jpg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;img&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;/images/image-filename-3.jpg&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-	&lt;span class=&quot;nt&quot;&gt;&amp;lt;figcaption&amp;gt;&lt;/span&gt;Caption describing these three images.&lt;span class=&quot;nt&quot;&gt;&amp;lt;/figcaption&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/figure&amp;gt;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;And you’ll get something that looks like this:&lt;/p&gt;
-
-&lt;figure class=&quot;third&quot;&gt;
-	&lt;img src=&quot;http://placehold.it/600x300.jpg&quot; /&gt;
-	&lt;img src=&quot;http://placehold.it/600x300.jpg&quot; /&gt;
-	&lt;img src=&quot;http://placehold.it/600x300.jpg&quot; /&gt;
-	&lt;figcaption&gt;Three images.&lt;/figcaption&gt;
-&lt;/figure&gt;
-
-&lt;h3 id=&quot;alternative-way&quot;&gt;Alternative way&lt;/h3&gt;
-
-&lt;p&gt;Another way to achieve the same result is to include &lt;code class=&quot;highlighter-rouge&quot;&gt;gallery&lt;/code&gt; Liquid template. In this case you
-don’t have to write any HTML tags – just copy a small block of code, adjust the parameters (see below)
-and fill the block with any number of links to images. You can mix relative and external links.&lt;/p&gt;
-
-&lt;p&gt;Here is the block you might want to use:&lt;/p&gt;
-
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-liquid&quot; data-lang=&quot;liquid&quot;&gt;&lt;span class=&quot;p&quot;&gt;{%&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;capture&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;images&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%}&lt;/span&gt;
-	http://vignette2.wikia.nocookie.net/naruto/images/9/97/Hinata.png
-	http://vignette4.wikia.nocookie.net/naruto/images/7/79/Hinata_Part_II.png
-	http://vignette1.wikia.nocookie.net/naruto/images/1/15/J%C5%ABho_S%C5%8Dshiken.png
-&lt;span class=&quot;p&quot;&gt;{%&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;endcapture&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%}&lt;/span&gt;
-&lt;span class=&quot;p&quot;&gt;{%&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;include&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;gallery&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;images&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;images&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;caption&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;Test images&quot;&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;cols&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;3&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;p&quot;&gt;%}&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
-
-&lt;p&gt;Parameters:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;caption&lt;/code&gt;: Sets the caption under the gallery (see &lt;code class=&quot;highlighter-rouge&quot;&gt;figcaption&lt;/code&gt; HTML tag above);&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cols&lt;/code&gt;: Sets the number of columns of the gallery.
-Available values: [1..3].&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;It will look something like this:&lt;/p&gt;
-
-&lt;figure class=&quot;third&quot;&gt;
-    
-    &lt;a href=&quot;http://vignette2.wikia.nocookie.net/naruto/images/9/97/Hinata.png&quot;&gt;&lt;img src=&quot;http://vignette2.wikia.nocookie.net/naruto/images/9/97/Hinata.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;a href=&quot;http://vignette4.wikia.nocookie.net/naruto/images/7/79/Hinata_Part_II.png&quot;&gt;&lt;img src=&quot;http://vignette4.wikia.nocookie.net/naruto/images/7/79/Hinata_Part_II.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;a href=&quot;http://vignette1.wikia.nocookie.net/naruto/images/1/15/J%C5%ABho_S%C5%8Dshiken.png&quot;&gt;&lt;img src=&quot;http://vignette1.wikia.nocookie.net/naruto/images/1/15/J%C5%ABho_S%C5%8Dshiken.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;
-    
-    &lt;figcaption&gt;Test images&lt;/figcaption&gt;
-&lt;/figure&gt;</content><author><name></name></author><category term="sample post" /><category term="images" /><category term="test" /><summary type="html">Examples and code for displaying images in posts.</summary></entry><entry><title type="html">Post with Image Feature</title><link href="http://localhost:4000/readability-feature-post/" rel="alternate" type="text/html" title="Post with Image Feature" /><published>2012-05-23T00:00:00+08:00</published><updated>2012-05-23T00:00:00+08:00</updated><id>http://localhost:4000/readability-feature-post</id><content type="html" xml:base="http://localhost:4000/readability-feature-post/">&lt;p&gt;Portland in shoreditch Vice, labore typewriter pariatur hoodie fap sartorial Austin. Pinterest literally occupy Schlitz forage. Odio ad blue bottle vinyl, 90’s narwhal commodo bitters pour-over nostrud. Ugh est hashtag in, fingerstache adipisicing laboris esse Pinterest shabby chic Portland. Shoreditch bicycle rights anim, flexitarian laboris put a bird on it vinyl cupidatat narwhal. Hashtag artisan skateboard, flannel Bushwick nesciunt salvia aute fixie do plaid post-ironic dolor McSweeney’s. Cliche pour-over chambray nulla four loko skateboard sapiente hashtag.&lt;/p&gt;
-
-&lt;p&gt;Vero laborum commodo occupy. Semiotics voluptate mumblecore pug. Cosby sweater ullamco quinoa ennui assumenda, sapiente occupy delectus lo-fi. Ea fashion axe Marfa cillum aliquip. Retro Bushwick keytar cliche. Before they sold out sustainable gastropub Marfa readymade, ethical Williamsburg skateboard brunch qui consectetur gentrify semiotics. Mustache cillum irony, fingerstache magna pour-over keffiyeh tousled selfies.&lt;/p&gt;
-
-&lt;h2 id=&quot;cupidatat-90s-lo-fi-authentic-try-hard&quot;&gt;Cupidatat 90’s lo-fi authentic try-hard&lt;/h2&gt;
-
-&lt;p&gt;In pug Portland incididunt mlkshk put a bird on it vinyl quinoa. Terry Richardson shabby chic +1, scenester Tonx excepteur tempor fugiat voluptate fingerstache aliquip nisi next level. Farm-to-table hashtag Truffaut, Odd Future ex meggings gentrify single-origin coffee try-hard 90’s.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Sartorial hoodie&lt;/li&gt;
-  &lt;li&gt;Labore viral forage&lt;/li&gt;
-  &lt;li&gt;Tote bag selvage&lt;/li&gt;
-  &lt;li&gt;DIY exercitation et id ugh tumblr church-key&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Incididunt umami sriracha, ethical fugiat VHS ex assumenda yr irure direct trade. Marfa Truffaut bicycle rights, kitsch placeat Etsy kogi asymmetrical. Beard locavore flexitarian, kitsch photo booth hoodie plaid ethical readymade leggings yr.&lt;/p&gt;
-
-&lt;p&gt;Aesthetic odio dolore, meggings disrupt qui readymade stumptown brunch Terry Richardson pour-over gluten-free. Banksy american apparel in selfies, biodiesel flexitarian organic meh wolf quinoa gentrify banjo kogi. Readymade tofu ex, scenester dolor umami fingerstache occaecat fashion axe Carles jean shorts minim. Keffiyeh fashion axe nisi Godard mlkshk dolore. Lomo you probably haven’t heard of them eu non, Odd Future Truffaut pug keytar meggings McSweeney’s Pinterest cred. Etsy literally aute esse, eu bicycle rights qui meggings fanny pack. Gentrify leggings pug flannel duis.&lt;/p&gt;
-
-&lt;h2 id=&quot;forage-occaecat-cardigan-qui&quot;&gt;Forage occaecat cardigan qui&lt;/h2&gt;
-
-&lt;p&gt;Fashion axe hella gastropub lo-fi kogi 90’s aliquip +1 veniam delectus tousled. Cred sriracha locavore gastropub kale chips, iPhone mollit sartorial. Anim dolore 8-bit, pork belly dolor photo booth aute flannel small batch. Dolor disrupt ennui, tattooed whatever salvia Banksy sartorial roof party selfies raw denim sint meh pour-over. Ennui eu cardigan sint, gentrify iPhone cornhole.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Whatever velit occaecat quis deserunt gastropub, leggings elit tousled roof party 3 wolf moon kogi pug blue bottle ea. Fashion axe shabby chic Austin quinoa pickled laborum bitters next level, disrupt deep v accusamus non fingerstache.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Tote bag asymmetrical elit sunt. Occaecat authentic Marfa, hella McSweeney’s next level irure veniam master cleanse. Sed hoodie letterpress artisan wolf leggings, 3 wolf moon commodo ullamco. Anim occupy ea labore Terry Richardson. Tofu ex master cleanse in whatever pitchfork banh mi, occupy fugiat fanny pack Austin authentic. Magna fugiat 3 wolf moon, labore McSweeney’s sustainable vero consectetur. Gluten-free disrupt enim, aesthetic fugiat jean shorts trust fund keffiyeh magna try-hard.&lt;/p&gt;
-
-&lt;h2 id=&quot;hoodie-duis&quot;&gt;Hoodie Duis&lt;/h2&gt;
-
-&lt;p&gt;Actually salvia consectetur, hoodie duis lomo YOLO sunt sriracha. Aute pop-up brunch farm-to-table odio, salvia irure occaecat. Sriracha small batch literally skateboard. Echo Park nihil hoodie, aliquip forage artisan laboris. Trust fund reprehenderit nulla locavore. Stumptown raw denim kitsch, keffiyeh nulla twee dreamcatcher fanny pack ullamco 90’s pop-up est culpa farm-to-table. Selfies 8-bit do pug odio.&lt;/p&gt;
-
-&lt;h3 id=&quot;thundercats-ho&quot;&gt;Thundercats Ho!&lt;/h3&gt;
-
-&lt;p&gt;Fingerstache thundercats Williamsburg, deep v scenester Banksy ennui vinyl selfies mollit biodiesel duis odio pop-up. Banksy 3 wolf moon try-hard, sapiente enim stumptown deep v ad letterpress. Squid beard brunch, exercitation raw denim yr sint direct trade. Raw denim narwhal id, flannel DIY McSweeney’s seitan. Letterpress artisan bespoke accusamus, meggings laboris consequat Truffaut qui in seitan. Sustainable cornhole Schlitz, twee Cosby sweater banh mi deep v forage letterpress flannel whatever keffiyeh. Sartorial cred irure, semiotics ethical sed blue bottle nihil letterpress.&lt;/p&gt;
-
-&lt;p&gt;Occupy et selvage squid, pug brunch blog nesciunt hashtag mumblecore skateboard yr kogi. Ugh small batch swag four loko. Fap post-ironic qui tote bag farm-to-table american apparel scenester keffiyeh vero, swag non pour-over gentrify authentic pitchfork. Schlitz scenester lo-fi voluptate, tote bag irony bicycle rights pariatur vero Vice freegan wayfarers exercitation nisi shoreditch. Chambray tofu vero sed. Street art swag literally leggings, Cosby sweater mixtape PBR lomo Banksy non in pitchfork ennui McSweeney’s selfies. Odd Future Banksy non authentic.&lt;/p&gt;
-
-&lt;p&gt;Aliquip enim artisan dolor post-ironic. Pug tote bag Marfa, deserunt pour-over Portland wolf eu odio intelligentsia american apparel ugh ea. Sunt viral et, 3 wolf moon gastropub pug id. Id fashion axe est typewriter, mlkshk Portland art party aute brunch. Sint pork belly Cosby sweater, deep v mumblecore kitsch american apparel. Try-hard direct trade tumblr sint skateboard. Adipisicing bitters excepteur biodiesel, pickled gastropub aute veniam.&lt;/p&gt;</content><author><name></name></author><category term="sample post" /><category term="readability" /><category term="test" /><category term="image" /><category term="feature" /><category term="xxxxxxxx" /><summary type="html">A ton of text to test readability with image feature.</summary></entry><entry><title type="html">Testing Readability with a Bunch of Text</title><link href="http://localhost:4000/readability-post/" rel="alternate" type="text/html" title="Testing Readability with a Bunch of Text" /><published>2012-05-22T00:00:00+08:00</published><updated>2012-05-22T00:00:00+08:00</updated><id>http://localhost:4000/readability-post</id><content type="html" xml:base="http://localhost:4000/readability-post/">&lt;p&gt;Portland in shoreditch Vice, labore typewriter pariatur hoodie fap sartorial Austin. Pinterest literally occupy Schlitz forage. Odio ad blue bottle vinyl, 90’s narwhal commodo bitters pour-over nostrud. Ugh est hashtag in, fingerstache adipisicing laboris esse Pinterest shabby chic Portland. Shoreditch bicycle rights anim, flexitarian laboris put a bird on it vinyl cupidatat narwhal. Hashtag artisan skateboard, flannel Bushwick nesciunt salvia aute fixie do plaid post-ironic dolor McSweeney’s. Cliche pour-over chambray nulla four loko skateboard sapiente hashtag.&lt;/p&gt;
-
-&lt;p&gt;Vero laborum commodo occupy. Semiotics voluptate mumblecore pug. Cosby sweater ullamco quinoa ennui assumenda, sapiente occupy delectus lo-fi. Ea fashion axe Marfa cillum aliquip. Retro Bushwick keytar cliche. Before they sold out sustainable gastropub Marfa readymade, ethical Williamsburg skateboard brunch qui consectetur gentrify semiotics. Mustache cillum irony, fingerstache magna pour-over keffiyeh tousled selfies.&lt;/p&gt;
-
-&lt;h2 id=&quot;cupidatat-90s-lo-fi-authentic-try-hard&quot;&gt;Cupidatat 90’s lo-fi authentic try-hard&lt;/h2&gt;
-
-&lt;p&gt;In pug Portland incididunt mlkshk put a bird on it vinyl quinoa. Terry Richardson shabby chic +1, scenester Tonx excepteur tempor fugiat voluptate fingerstache aliquip nisi next level. Farm-to-table hashtag Truffaut, Odd Future ex meggings gentrify single-origin coffee try-hard 90’s.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Sartorial hoodie&lt;/li&gt;
-  &lt;li&gt;Labore viral forage&lt;/li&gt;
-  &lt;li&gt;Tote bag selvage&lt;/li&gt;
-  &lt;li&gt;DIY exercitation et id ugh tumblr church-key&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Incididunt umami sriracha, ethical fugiat VHS ex assumenda yr irure direct trade. Marfa Truffaut bicycle rights, kitsch placeat Etsy kogi asymmetrical. Beard locavore flexitarian, kitsch photo booth hoodie plaid ethical readymade leggings yr.&lt;/p&gt;
-
-&lt;p&gt;Aesthetic odio dolore, meggings disrupt qui readymade stumptown brunch Terry Richardson pour-over gluten-free. Banksy american apparel in selfies, biodiesel flexitarian organic meh wolf quinoa gentrify banjo kogi. Readymade tofu ex, scenester dolor umami fingerstache occaecat fashion axe Carles jean shorts minim. Keffiyeh fashion axe nisi Godard mlkshk dolore. Lomo you probably haven’t heard of them eu non, Odd Future Truffaut pug keytar meggings McSweeney’s Pinterest cred. Etsy literally aute esse, eu bicycle rights qui meggings fanny pack. Gentrify leggings pug flannel duis.&lt;/p&gt;
-
-&lt;h2 id=&quot;forage-occaecat-cardigan-qui&quot;&gt;Forage occaecat cardigan qui&lt;/h2&gt;
-
-&lt;p&gt;Fashion axe hella gastropub lo-fi kogi 90’s aliquip +1 veniam delectus tousled. Cred sriracha locavore gastropub kale chips, iPhone mollit sartorial. Anim dolore 8-bit, pork belly dolor photo booth aute flannel small batch. Dolor disrupt ennui, tattooed whatever salvia Banksy sartorial roof party selfies raw denim sint meh pour-over. Ennui eu cardigan sint, gentrify iPhone cornhole.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Whatever velit occaecat quis deserunt gastropub, leggings elit tousled roof party 3 wolf moon kogi pug blue bottle ea. Fashion axe shabby chic Austin quinoa pickled laborum bitters next level, disrupt deep v accusamus non fingerstache.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Tote bag asymmetrical elit sunt. Occaecat authentic Marfa, hella McSweeney’s next level irure veniam master cleanse. Sed hoodie letterpress artisan wolf leggings, 3 wolf moon commodo ullamco. Anim occupy ea labore Terry Richardson. Tofu ex master cleanse in whatever pitchfork banh mi, occupy fugiat fanny pack Austin authentic. Magna fugiat 3 wolf moon, labore McSweeney’s sustainable vero consectetur. Gluten-free disrupt enim, aesthetic fugiat jean shorts trust fund keffiyeh magna try-hard.&lt;/p&gt;
-
-&lt;h2 id=&quot;hoodie-duis&quot;&gt;Hoodie Duis&lt;/h2&gt;
-
-&lt;p&gt;Actually salvia consectetur, hoodie duis lomo YOLO sunt sriracha. Aute pop-up brunch farm-to-table odio, salvia irure occaecat. Sriracha small batch literally skateboard. Echo Park nihil hoodie, aliquip forage artisan laboris. Trust fund reprehenderit nulla locavore. Stumptown raw denim kitsch, keffiyeh nulla twee dreamcatcher fanny pack ullamco 90’s pop-up est culpa farm-to-table. Selfies 8-bit do pug odio.&lt;/p&gt;
-
-&lt;h3 id=&quot;thundercats-ho&quot;&gt;Thundercats Ho!&lt;/h3&gt;
-
-&lt;p&gt;Fingerstache thundercats Williamsburg, deep v scenester Banksy ennui vinyl selfies mollit biodiesel duis odio pop-up. Banksy 3 wolf moon try-hard, sapiente enim stumptown deep v ad letterpress. Squid beard brunch, exercitation raw denim yr sint direct trade. Raw denim narwhal id, flannel DIY McSweeney’s seitan. Letterpress artisan bespoke accusamus, meggings laboris consequat Truffaut qui in seitan. Sustainable cornhole Schlitz, twee Cosby sweater banh mi deep v forage letterpress flannel whatever keffiyeh. Sartorial cred irure, semiotics ethical sed blue bottle nihil letterpress.&lt;/p&gt;
-
-&lt;p&gt;Occupy et selvage squid, pug brunch blog nesciunt hashtag mumblecore skateboard yr kogi. Ugh small batch swag four loko. Fap post-ironic qui tote bag farm-to-table american apparel scenester keffiyeh vero, swag non pour-over gentrify authentic pitchfork. Schlitz scenester lo-fi voluptate, tote bag irony bicycle rights pariatur vero Vice freegan wayfarers exercitation nisi shoreditch. Chambray tofu vero sed. Street art swag literally leggings, Cosby sweater mixtape PBR lomo Banksy non in pitchfork ennui McSweeney’s selfies. Odd Future Banksy non authentic.&lt;/p&gt;
-
-&lt;p&gt;Aliquip enim artisan dolor post-ironic. Pug tote bag Marfa, deserunt pour-over Portland wolf eu odio intelligentsia american apparel ugh ea. Sunt viral et, 3 wolf moon gastropub pug id. Id fashion axe est typewriter, mlkshk Portland art party aute brunch. Sint pork belly Cosby sweater, deep v mumblecore kitsch american apparel. Try-hard direct trade tumblr sint skateboard. Adipisicing bitters excepteur biodiesel, pickled gastropub aute veniam.&lt;/p&gt;</content><author><name></name></author><category term="sample post" /><category term="readability" /><category term="test" /><summary type="html">A ton of text to test readability.</summary></entry></feed>
+&lt;p&gt;最后放上源码地址: &lt;a href=&quot;https://github.com/pang-weichao/javamailDemo&quot;&gt;javaMail源码&lt;/a&gt;&lt;/p&gt;</content><author><name></name></author><category term="java" /><category term="javaMail" /><summary type="html">邮件的简单封装，用于发送给邮件</summary></entry></feed>

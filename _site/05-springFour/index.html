@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]--><!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8"><![endif]--><!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9"><![endif]--><!--[if gt IE 8]><!--><html class="no-js">
+<!--<![endif]--> <head> <meta charset="UTF-8"> <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"> <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1"> <title>spring 四aop – Pangweichao</title> <meta name="description" content="java web 后端"> <meta name="keywords" content="java, spring"> <!-- Twitter Cards --> <meta name="twitter:card" content="summary"> <meta name="twitter:image" content="http://localhost:4000/assets/img/logo.png"> <meta name="twitter:title" content="spring 四aop"> <meta name="twitter:description" content="spring的aop概念及体验"> <!-- Open Graph --> <meta property="og:locale" content="en_US"> <meta property="og:type" content="article"> <meta property="og:title" content="spring 四aop"> <meta property="og:description" content="spring的aop概念及体验"> <meta property="og:url" content="http://localhost:4000/05-springFour/"> <meta property="og:site_name" content="Pangweichao"> <meta property="og:image" content="http://localhost:4000/assets/img/logo.png"> <link rel="canonical" href="http://localhost:4000/05-springFour/"> <link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Pangweichao Feed"> <!-- Handheld --> <meta name="HandheldFriendly" content="True"> <meta name="MobileOptimized" content="320"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- CSS --> <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css"> <!-- JS --> <script src="http://localhost:4000/assets/js/modernizr-3.3.1.custom.min.js"></script> <!-- Favicons --> <link rel="apple-touch-icon" href="http://localhost:4000/assets/img/favicons/apple-icon-precomposed.png"> <link rel="apple-touch-icon" sizes="72x72" href="http://localhost:4000/assets/img/favicons/apple-icon-72x72.png"> <link rel="apple-touch-icon" sizes="114x114" href="http://localhost:4000/assets/img/favicons/apple-icon-114x114.png"> <link rel="apple-touch-icon" sizes="144x144" href="http://localhost:4000/assets/img/favicons/apple-icon-144x144.png"> <link rel="shortcut icon" type="image/png" href="http://localhost:4000/favicon.png"> <link rel="shortcut icon" href="http://localhost:4000/favicon.ico"> <!-- Background Image --> <style type="text/css">body {background-image:url(http://localhost:4000/assets/img/placeholder-big.jpg); background-repeat: no-repeat; background-size: cover; }</style> <!-- Post Feature Image --> </head> <body> <nav id="dl-menu" class="dl-menuwrapper" role="navigation"> <button class="dl-trigger">Open Menu</button> <ul class="dl-menu"> <li><a href="http://localhost:4000/">主页</a></li> <li> <a href="#">文章</a> <ul class="dl-submenu"> <li><a href="http://localhost:4000/posts/">全部文章</a></li> <li><a href="http://localhost:4000/tags/">全部标签</a></li> </ul> </li> <li><a href="http://localhost:4000/projects/">资料</a></li> </ul>
+<!-- /.dl-menu --> </nav><!-- /.dl-menuwrapper --> <!-- Header --> <header class="header" role="banner"> <div class="wrapper animated fadeIn"> <div class="content"> <div class="post-title "> <h1>spring 四aop</h1> <h4>10 May 2017</h4> <p class="reading-time"> <i class="fa fa-clock-o"></i> Reading time ~2 minutes </p>
+<!-- /.entry-reading-time --> <a class="btn zoombtn" href="http://localhost:4000/posts/"> <i class="fa fa-chevron-left"></i> </a> </div> <h3 id="aop是什么">aop是什么?</h3> <p>aop(aspect oriented programming) 面向切面编程，对所有对象或者一类对象的编程。 举个例子，我们现在有3个类，每个类都有同样的一个需求，其功能是记录该类的调用时间，那么我们是不是就需要在三个类中写三遍同样的代码，如果类越来越多呢，每个类都写一遍？不现实，那么这里我们就可以使用aop编程，他可以就写一遍该方法，然后将该方法织入给每个类。看下图再初步理解一下 <img src="http://upload-images.jianshu.io/upload_images/4638441-0b8936287f759eaf.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="初步理解图"></p> <hr> <p>下面我们根据aop中的概念结合例子来看看(先看概念再看例子再看概念)。</p> <h3 id="aop中的几个概念">aop中的几个概念</h3> <ol> <li>切面：要实现的功能，是系统模块化的一个切面或领域。如调用时间。</li> <li>通知：切面的实际实现，他通知系统新的行为。通知在连接点插入到系统中。</li> <li>连接点：应用程序执行过程中插入切面的地点。 <img src="http://upload-images.jianshu.io/upload_images/4638441-b9fd7336a3a4c292.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="连接点示意图"> 这里只看连接点的位置，至于通知类型会在后面介绍，还有异常通知，他会在你抛出异常时将通知插入进来。</li> <li>切入点：定义了通知应该应用在哪些连接点上，通知可以应用在aop框架支持的任何连接点。可以这样理解，切入点就是当通知插入到某个连接点时，这个连接点就成了切入点。</li> <li>引入：为类添加新方法和属性</li> <li>目标对象：被通知的对象，既可以是被通知的类，也可以是第三方类。</li> <li>代理：将通知应用到目标对象之后创建的对象，应用系统的其他部分不用为了支持代理对象而改变。</li> <li>织入：将切面应用到目标对象从而创建的一个新的对象的过程，织入发生在目标对象生命周期的多个点上。</li> </ol> <hr> <h3 id="aop的实现">aop的实现</h3> <p>aop是通过生成代理对象来实现通知织入的。就像某个品牌的代理，这个品牌是被代理对象，下面有他们的代理商，而代理商需要通过品牌的授权才能代理，这里的品牌就像我们的被代理对象（firstDemo），而授权过程就是织入（applicationContext中配置），代理商就是代理对象（applicationContext中配置）。 <img src="http://upload-images.jianshu.io/upload_images/4638441-2235aa8d735c0387.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="实现"></p> <hr> <h3 id="例子">例子</h3> <p>该例子使用前置通知来实现在调用类的方法前打印出时间。 新建一个module,如下 <img src="http://upload-images.jianshu.io/upload_images/4638441-c9ba2d727d677b95.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="aop"> 我们现在只用到NameDemo,MyMethodBeforeAdvice和FirstDemo这三个java文件，其余文件在后面用到。在FirstDemo中只有一个name属性和一个方法，代码如下。</p> <div class="highlighter-rouge"><pre class="highlight"><code>public class FirstDemo implements NameDemo{
+
+    private String name;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * 该方法继承自NameDemo
+     */
+    @Override
+    public void printName() {
+        System.out.println("执行pringName "+name);
+    }
+
+}
+</code></pre></div> <p>NameDemo为接口，FirstDemo继承该接口，firstDemo中的方法就是继承自这里。 MyMethodBeforeAdvice为前置通知，实现我们需要的功能（这里就是显示出调用时间）。代码如下。</p> <div class="highlighter-rouge"><pre class="highlight"><code>public class MyMethodBeforeAdvice implements MethodBeforeAdvice {
+    @Override
+    public void before(Method method, Object[] objects, Object o) throws Throwable {
+        System.out.println("--------------------------------------------------");
+        System.out.println("调用"+method+"的时间是"+new Date());
+    }
+}
+</code></pre></div> <p>现在我们就可以让firstDemo的方法在调用前打印出调用的时间。我们在applicationContext中做如下配置，产生代理对象，我们拿到代理对象就可以实现了。</p> <div class="highlighter-rouge"><pre class="highlight"><code>    &lt;!--配置被代理对象--&gt;
+    &lt;bean id="firstDemo" class="cn.pwc.demo.FirstDemo"&gt;
+        &lt;property name="name" value="xiaomao"/&gt;
+    &lt;/bean&gt;
+
+    &lt;!--配置前置通知--&gt;
+    &lt;bean id="myMethodBeforeAdvice" class="cn.pwc.demo.MyMethodBeforeAdvice"/&gt;
+
+    &lt;!--配置代理对象--&gt;
+    &lt;bean id="proxyFactoryBean" class="org.springframework.aop.framework.ProxyFactoryBean"&gt;
+        &lt;!--代理接口集--&gt;
+        &lt;property name="proxyInterfaces"&gt;
+            &lt;list&gt;
+                &lt;value&gt;cn.pwc.demo.NameDemo&lt;/value&gt;
+            &lt;/list&gt;
+        &lt;/property&gt;
+        &lt;!--通知名集--&gt;
+        &lt;property name="interceptorNames"&gt;
+            &lt;list&gt;
+                &lt;value&gt;myMethodBeforeAdvice&lt;/value&gt;
+            &lt;/list&gt;
+        &lt;/property&gt;
+        &lt;!--代理哪些对象--&gt;
+        &lt;property name="target" ref="firstDemo"/&gt;
+    &lt;/bean&gt;
+</code></pre></div> <p>我要进行代理肯定要知道代理的是什么（这里的前置通知）和代理谁（被代理对象），然后生成我们的代理对象。生成代理对象时我们需要将前面的通知和被代理对象配置进去。然后我们去test文件中进行测试</p> <div class="highlighter-rouge"><pre class="highlight"><code>public static void main(String[] args){
+        ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+        NameDemo demo = (NameDemo) applicationContext.getBean("proxyFactoryBean");
+        demo.printName();
+    }
+</code></pre></div> <p>这里是不是有点不同，我们平时获取bean应该是 ` FirstDemo firstDemo = (FirstDemo) applicationContext.getBean(“firstDemo”); ` 如果这样获取那么我们刚才的代理操作完全白做了，取到的对象没有经过代理的渠道，自然也不会有通知织入进去，所以我们在获取bean的时候要获取代理对象。而且要注意的是我们这里获取到对象要转为接口对象。运行结果 <img src="http://upload-images.jianshu.io/upload_images/4638441-425f4f278e2608fa.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="结果"> 现在返回看刚才的定义，通知就是MyMethodBeforeAdvice类，切入点就是printName调用前，目标对象就是proxyFactoryBean。接下来来看看通知的类型。</p> <hr> <h3 id="通知的类型">通知的类型</h3> <p>通知有五种类型。分别是前置通知，后置通知，环绕通知，异常通知和引入通知</p> <ol> <li>前置通知就是在方法调用前调用通知类中的方法。 ``` /** * <ul> <li>
+<a href="https://github.com/param" class="user-mention">@param</a> method 被调用的方法</li> <li>
+<a href="https://github.com/param" class="user-mention">@param</a> objects 给这个方法传递的参数</li> <li>
+<a href="https://github.com/param" class="user-mention">@param</a> o 目标对象</li> <li>
+<a href="https://github.com/throws" class="user-mention">@throws</a> Throwable */ <a href="https://github.com/Override" class="user-mention">@Override</a> public void before(Method method, Object[] objects, Object o) throws Throwable { System.out.println(“————————————————–”); System.out.println(“调用”+method+”的时间是”+new Date()); } ```</li> </ul> </li> <li>后置通知就是在方法调用后调用通知类中的方法。 ``` public class MyMethodAfterAdvice implements AfterReturningAdvice { /** * <ul> <li>
+<a href="https://github.com/param" class="user-mention">@param</a> o 被调用方法的返回值</li> <li>
+<a href="https://github.com/param" class="user-mention">@param</a> method 被调用的方法</li> <li>
+<a href="https://github.com/param" class="user-mention">@param</a> objects 被调用方法传的参数</li> <li>
+<a href="https://github.com/param" class="user-mention">@param</a> o1 目标对象</li> <li>
+<a href="https://github.com/throws" class="user-mention">@throws</a> Throwable */ <a href="https://github.com/Override" class="user-mention">@Override</a> public void afterReturning(Object o, Method method, Object[] objects, Object o1) throws Throwable { System.out.println(“后置通知被调用啦”); } } ```</li> </ul> </li> <li>环绕通知，直接看代码注释 <div class="highlighter-rouge"><pre class="highlight"><code>public class MyMethodInterceptor implements MethodInterceptor {
+ @Override
+ public Object invoke(MethodInvocation methodInvocation) throws Throwable {
+     //被调用方法的方法体前的操作
+     System.out.println("环绕通知的前切入点");
+     //运行被调用方法的方法体
+     Object obj = methodInvocation.proceed();
+     //被调用方法的方法体后的操作
+     System.out.println("环绕通知的后切入点");
+     return obj;
+ }
+}
+</code></pre></div> </li> <li>异常通知就是在发生异常时执行通知代码（我们手动在方法中抛错） <div class="highlighter-rouge"><pre class="highlight"><code>public class MyMethodThrowAdvice implements ThrowsAdvice {
+ public void afterThrowing(Throwable throwable){
+     System.out.println("异常通知被调用");
+ }
+}
+</code></pre></div> <p>前面4种通知测试一遍如图 <img src="http://upload-images.jianshu.io/upload_images/4638441-1e8d31fb25ccb96d.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="test">这里多出的一个方法是为了防止抛出错误之后后面的停止运行导致看不到环绕通知的后切入点和后置通知，现在的firstDemo代码为</p> <div class="highlighter-rouge"><pre class="highlight"><code>public class FirstDemo implements NameDemo,AgeDemo {
+
+ private String name;
+
+ public String getName() {
+     return name;
+ }
+
+ public void setName(String name) {
+     this.name = name;
+ }
+
+ /**
+  * 该方法继承自NameDemo
+  */
+ @Override
+ public void printName() {
+     System.out.println("执行pringName "+name);
+ }
+
+ @Override
+ public void printAge() {
+     System.out.println("我100岁啦！");
+     int i = 1/0;
+ }
+}
+</code></pre></div> </li> <li>引入通知 只需要在application中配置就行，比如我们的前置通知只对printName有效而对printAge无效，我们可以如下配置 <div class="highlighter-rouge"><pre class="highlight"><code>&lt;!--定义切入点--&gt;
+ &lt;bean id="before" class="org.springframework.aop.support.NameMatchMethodPointcutAdvisor"&gt;
+     &lt;property name="advice" ref="myMethodBeforeAdvice"/&gt;
+     &lt;property name="mappedNames"&gt;
+         &lt;list&gt;
+             &lt;value&gt;printName&lt;/value&gt;
+         &lt;/list&gt;
+     &lt;/property&gt;
+ &lt;/bean&gt;
+</code></pre></div> <p>然后将配置对象中的通知名集的myMethodBeforeAdvice改为before，运行如下。 <img src="http://upload-images.jianshu.io/upload_images/4638441-638e9e46a2859ae6.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="结果"></p> </li> </ol> <p>源码地址：<a href="https://github.com/pang-weichao/springDemo">springDemo</a></p> <div class="entry-meta"> <br> <hr> <span class="entry-tags"><a href="http://localhost:4000/tags/#java" title="Pages tagged java" class="tag"><span class="term">java</span></a><a href="http://localhost:4000/tags/#spring" title="Pages tagged spring" class="tag"><span class="term">spring</span></a></span> <span class="social-share"> </span> <div style="clear:both"></div> </div> </div> </div> <section id="disqus_thread" class="animated fadeInUp"></section><!-- /#disqus_thread --> </header> <!-- JS --> <script src="http://localhost:4000/assets/js/jquery-1.12.0.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.dlmenu.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.goup.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.magnific-popup.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.fitvid.min.js"></script> <script src="http://localhost:4000/assets/js/scripts.js"></script> <script type="text/javascript"> var disqus_shortname = 'taylantatli'; (function() { var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })(); (function () { var s = document.createElement('script'); s.async = true; s.type = 'text/javascript'; s.src = '//' + disqus_shortname + '.disqus.com/count.js'; (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s); }()); </script> <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a>
+</noscript> <!-- MathJax --> <script async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> </body> </html>

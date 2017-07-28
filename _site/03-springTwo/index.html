@@ -1,0 +1,56 @@
+<!DOCTYPE html> <!--[if lt IE 7]><html class="no-js lt-ie9 lt-ie8 lt-ie7"> <![endif]--> <!--[if (IE 7)&!(IEMobile)]><html class="no-js lt-ie9 lt-ie8"><![endif]--> <!--[if (IE 8)&!(IEMobile)]><html class="no-js lt-ie9"><![endif]--> <!--[if gt IE 8]><!--> <html class="no-js"><!--<![endif]--> <head> <meta charset="UTF-8"> <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"> <meta http-equiv=X-UA-Compatible content="IE=edge,chrome=1"> <title>spring 二ioc di &#8211; Pangweichao</title> <meta name="description" content="java web 后端"> <meta name="keywords" content="java, spring"> <!-- Twitter Cards --> <meta name="twitter:card" content="summary"> <meta name="twitter:image" content="http://localhost:4000/assets/img/logo.png"> <meta name="twitter:title" content="spring 二ioc di"> <meta name="twitter:description" content="spring的ioc和di体验"> <!-- Open Graph --> <meta property="og:locale" content="en_US"> <meta property="og:type" content="article"> <meta property="og:title" content="spring 二ioc di"> <meta property="og:description" content="spring的ioc和di体验"> <meta property="og:url" content="http://localhost:4000/03-springTwo/"> <meta property="og:site_name" content="Pangweichao"> <meta property="og:image" content="http://localhost:4000/assets/img/logo.png"> <link rel="canonical" href="http://localhost:4000/03-springTwo/"> <link href="http://localhost:4000/feed.xml" type="application/atom+xml" rel="alternate" title="Pangweichao Feed"> <!-- Handheld --> <meta name="HandheldFriendly" content="True"> <meta name="MobileOptimized" content="320"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- CSS --> <link rel="stylesheet" href="http://localhost:4000/assets/css/main.css"> <!-- JS --> <script src="http://localhost:4000/assets/js/modernizr-3.3.1.custom.min.js"></script> <!-- Favicons --> <link rel="apple-touch-icon" href="http://localhost:4000/assets/img/favicons/apple-icon-precomposed.png"> <link rel="apple-touch-icon" sizes="72x72" href="http://localhost:4000/assets/img/favicons/apple-icon-72x72.png"> <link rel="apple-touch-icon" sizes="114x114" href="http://localhost:4000/assets/img/favicons/apple-icon-114x114.png"> <link rel="apple-touch-icon" sizes="144x144" href="http://localhost:4000/assets/img/favicons/apple-icon-144x144.png"> <link rel="shortcut icon" type="image/png" href="http://localhost:4000/favicon.png" /> <link rel="shortcut icon" href="http://localhost:4000/favicon.ico" /> <!-- Background Image --> <style type="text/css">body {background-image:url(http://localhost:4000/assets/img/placeholder-big.jpg); background-repeat: no-repeat; background-size: cover; }</style> <!-- Post Feature Image --> </head> <body> <nav id="dl-menu" class="dl-menuwrapper" role="navigation"> <button class="dl-trigger">Open Menu</button> <ul class="dl-menu"> <li><a href="http://localhost:4000/">主页</a></li> <li> <a href="#">文章</a> <ul class="dl-submenu"> <li><a href="http://localhost:4000/posts/">全部文章</a></li> <li><a href="http://localhost:4000/tags/">全部标签</a></li> </ul> </li> <li><a href="http://localhost:4000/projects/" >资料</a></li> </ul><!-- /.dl-menu --> </nav><!-- /.dl-menuwrapper --> <!-- Header --> <header class="header" role="banner"> <div class="wrapper animated fadeIn"> <div class="content"> <div class="post-title "> <h1>spring 二ioc di</h1> <h4>10 May 2017</h4> <p class="reading-time"> <i class="fa fa-clock-o"></i> Reading time ~1 minute </p><!-- /.entry-reading-time --> <a class="btn zoombtn" href="http://localhost:4000/posts/"> <i class="fa fa-chevron-left"></i> </a> </div> <p>spring的核心就是ioc和di,对于这两个概念我们这里还是再给出一遍或者可以看 <a href="http://www.jianshu.com/p/97f18666232c">spring一 简介</a>。</p> <p>ioc(inverse of control) 控制反转，我们现在的创建对象实例都是通过new来创建，这样这个对象的创建权在于程序，但在spring中这个创建权给了spring，由spring来创建对象，这就是控制反转。</p> <p>di(dependency injection)依赖注入，依赖注入就是在创建对象的时候注入对象的属性值。</p> <p>对于ioc的理解，通过spring一的例子(创建对象的过程)应该有了一定的了解，那么我们我们就通过上次的module来看看ioc。</p> <hr /> <h3 id="ioc-控制反转">ioc 控制反转</h3> <p>我们在Test.java中通过new来创建一个对象，并通过set方法赋予name值。</p> <div class="highlighter-rouge"><pre class="highlight"><code>public static void main(String[] args){
+        FirstDemo firstDemo = new FirstDemo();
+        firstDemo.setDemoName("普通demoName");
+        firstDemo.printName();
+}
+</code></pre></div> <p>这个方法应该都没问题，那么我们接下来用spring配置bean的方法取得对象。 在applicationContext.xml中配置bean</p> <div class="highlighter-rouge"><pre class="highlight"><code>&lt;bean id="firstDemo" class="cn.pwc.demo.FirstDemo"&gt;
+     &lt;property name="demoName" value="spring的demoName"/&gt;
+&lt;/bean&gt;
+</code></pre></div> <p>id就是我们spring创建的对象的名称，后面在获取对象的时候通过getBean(“id”)方法获取到我们的对象。class是我们的类，指定这个bean创建的是哪个对象。property是我们的属性值，这里可以赋予类中指定属性的值，name指定类中的哪个属性，value就是赋予的值（value可以用ref替换，ref将会在di介绍里出现）。比如我们这里，创建一个名为firstDemo的FirstDemo对象，该对象的demoName值为springName。bean就创建好了，接下来去获取。</p> <div class="highlighter-rouge"><pre class="highlight"><code>public static void main(String[] args){
+     //获取spring容器的对象
+    ApplicationContext applicationContext = new ClassPathXmlApplicationContext("applicationContext.xml");
+    //取到对象
+    FirstDemo firstDemo = (FirstDemo) applicationContext.getBean("firstDemo");
+    //执行方法
+    firstDemo.printName();
+}
+</code></pre></div> <p>这里没什么好说的，看注释就行。 这样我们也可以得到对象并执行对象的方法，现在再回想一下ioc的定义(控制反转)，对象的创建权是不是交给了spring了。</p> <h3 id="di-依赖注入">di 依赖注入</h3> <p>至于依赖注入，其实我们已经接触到了，比如上面我们在配置bean的时候，properties不就对一个属性注入了一个值吗。那么怎么来看这个依赖。 我们在springDemo下新建一个module，取名为di。 <img src="http://upload-images.jianshu.io/upload_images/4638441-0c19f886ffed7266.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="di" /> 创建如图的项目结构，demo包下新建三个java文件，firstDemo和secondDemo里面有两个属性，name和thirdDemo。</p> <div class="highlighter-rouge"><pre class="highlight"><code>public class FirstDemo {
+
+    private String name;
+
+    private ThirdDemo td;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public ThirdDemo getTd() {
+        return td;
+    }
+
+    public void setTd(ThirdDemo td) {
+        this.td = td;
+    }
+
+    public void printName(){
+        System.out.println("名字是 " + name);
+        td.printName();
+    }
+}
+</code></pre></div> <p>而thirdDemo只有name属性。最主要来看bean的配置。</p> <div class="highlighter-rouge"><pre class="highlight"><code>&lt;bean id="firstDemo" class="cn.pwc.demo.FirstDemo"&gt;
+   &lt;property name="name" value="第一个demoName"/&gt;
+   &lt;property name="td" ref="thirdDemo"/&gt;
+&lt;/bean&gt;
+
+&lt;bean id="secondDemo" class="cn.pwc.demo.SecondDemo"&gt;
+    &lt;property name="name" value="第二个demoName"/&gt;
+&lt;/bean&gt;
+
+&lt;bean id="thirdDemo" class="cn.pwc.demo.ThirdDemo"&gt;
+    &lt;property name="name" value="第三个demoName"/&gt;
+&lt;/bean&gt;
+</code></pre></div> <p>这里我们给firstDemo两个属性值都注入了值，而secondDemo只注入了name值，这样也就意味着secondDemo并没有拿到thirdDemo的对象也就不能调用thirdDemo的方法。而我们的firstDemo注入了thirdDemo对象，通过ref来进行注入，属性的值是一个具体对象的我们就要通过ref来注入。现在我们就可以说firstDemo依赖与thirdDemo了，你现在能删thirdDemo这个bean吗，不能。因为有一个对象在创建时需要将thirdDemo对象实例注入给他的属性，我们现在就可以说firstDemo依赖于thirdDemo了。通过test.java就可以看出确实firstDemo拿到了thirdDemo对象而secondDemo并没有拿到。 <img src="http://upload-images.jianshu.io/upload_images/4638441-c3fb186cdaeea980.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240" alt="test" /> 下面说三个不是很确定的点，都是我自己这么认为的，不知道对错。 1 spring如何通过配置创建我们想要得到的实例 通过java的反射机制来创建这些的bean实例 2 注入是通过bean的set方法注入的 当我们不写属性的set方法时我们是注入不进去属性值的 3 applicationContext这个容器到底是什么样的，可以让我们拿到bean 他应该像是一个hash表，有一个key和value,我们通过key值来取得value。</p> <p>源码地址：<a href="https://github.com/pang-weichao/springDemo">springDemo</a></p> <div class="entry-meta"> <br> <hr> <span class="entry-tags"><a href="http://localhost:4000/tags/#java" title="Pages tagged java" class="tag"><span class="term">java</span></a><a href="http://localhost:4000/tags/#spring" title="Pages tagged spring" class="tag"><span class="term">spring</span></a></span> <span class="social-share"> </span> <div style="clear:both"></div> </div> </div> </div> <section id="disqus_thread" class="animated fadeInUp"></section><!-- /#disqus_thread --> </header> <!-- JS --> <script src="http://localhost:4000/assets/js/jquery-1.12.0.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.dlmenu.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.goup.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.magnific-popup.min.js"></script> <script src="http://localhost:4000/assets/js/jquery.fitvid.min.js"></script> <script src="http://localhost:4000/assets/js/scripts.js"></script> <script type="text/javascript"> var disqus_shortname = 'taylantatli'; (function() { var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true; dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js'; (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq); })(); (function () { var s = document.createElement('script'); s.async = true; s.type = 'text/javascript'; s.src = '//' + disqus_shortname + '.disqus.com/count.js'; (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s); }()); </script> <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript> <!-- MathJax --> <script async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> </body> </html>
